@@ -327,18 +327,37 @@ function saveKeyAndReload() {
 }
 
 // ════════════════════════════════════════════
-// FETCH FRED DATA
+// FETCH FRED DATA — CORS PROXY WITH FALLBACK
 // ════════════════════════════════════════════
+
+// Three proxy options tried in order — if one is down the next kicks in automatically
+const CORS_PROXIES = [
+  (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url) => `https://thingproxy.freeboard.io/fetch/${url}`,
+];
+
 async function fetchFredSeries(seriesId, apiKey, limit = 24) {
-  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=${limit}`;
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error(`FRED API error: ${resp.status}`);
-  const data = await resp.json();
-  // Return array of {date, value} sorted oldest-first, excluding missing values
-  return data.observations
-    .filter(o => o.value !== '.' && o.value !== '')
-    .map(o => ({ date: o.date, value: parseFloat(o.value) }))
-    .reverse();
+  const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=${limit}`;
+
+  let lastError;
+  for (const proxyFn of CORS_PROXIES) {
+    try {
+      const proxiedUrl = proxyFn(fredUrl);
+      const resp = await fetch(proxiedUrl, { signal: AbortSignal.timeout(8000) });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      if (!data.observations) throw new Error('No observations in response');
+      return data.observations
+        .filter(o => o.value !== '.' && o.value !== '')
+        .map(o => ({ date: o.date, value: parseFloat(o.value) }))
+        .reverse();
+    } catch (e) {
+      console.warn(`Proxy failed for ${seriesId}:`, e.message);
+      lastError = e;
+    }
+  }
+  throw new Error(`All proxies failed for ${seriesId}: ${lastError?.message}`);
 }
 
 async function fetchAllData(apiKey) {
@@ -920,10 +939,12 @@ async function init() {
 
   } catch (err) {
     console.error('FRED fetch error:', err);
-    if (err.message.includes('403') || err.message.includes('400')) {
+    if (err.message.includes('403') || err.message.includes('400') || err.message.includes('Invalid')) {
       showError('Invalid API key. Please check and re-enter.');
+    } else if (err.message.includes('All proxies failed')) {
+      showError('All CORS proxies failed. Check your internet connection, or try again in a moment — free proxies occasionally go down briefly.');
     } else {
-      showError('Network error. Check your internet connection.');
+      showError('Network error. Check your internet connection and try refreshing.');
     }
     renderMethodology();
   }
