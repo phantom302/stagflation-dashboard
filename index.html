@@ -807,26 +807,35 @@ async function init() {
     const raw = await fetchAllData(apiKey);
     setLoadStatus('COMPUTING RISK SCORES...', 92);
 
-    // Extract latest values
-    const coreCPIVal = latestVal(raw.CORE_CPI);
-    const gdpVal     = latestVal(raw.GDP);
-    const unrateVal  = latestVal(raw.UNRATE);
-    const ppiYoySeries = raw.PPI;
-    const ppiYoy     = yoyChange(raw.PPI);
-    const fedRateVal = latestVal(raw.FED_RATE);
-    const michVal    = latestVal(raw.MICH);
-    const m2Yoy      = yoyChange(raw.M2);
-    const pceVal     = latestVal(raw.PCE);
-    const corePceVal = latestVal(raw.CORE_PCE);
+    // ── Extract values ──────────────────────────────────────────────────
+    // FRED index-level series (CPILFESL, PCEPI, PPIFID, M2SL) need YoY%
+    // computed from the index, not used as raw numbers.
+    // Rate/% series (UNRATE, FEDFUNDS, MICH, GDP) are already percentages.
 
-    // Compute scores
+    const coreCPIYoy  = yoyChange(raw.CORE_CPI);   // CPILFESL index → YoY%
+    const ppiYoy      = yoyChange(raw.PPI);          // PPIFID index → YoY%
+    const m2Yoy       = yoyChange(raw.M2);           // M2SL index → YoY%
+    const pceYoy      = yoyChange(raw.PCE);          // PCEPI index → YoY%
+    const corePceYoy  = yoyChange(raw.CORE_PCE);     // DPCERE1Q156NBEA → YoY%
+
+    // These FRED series are already percentage/rate values — use latest directly
+    const gdpVal      = latestVal(raw.GDP);           // already annualized %
+    const unrateVal   = latestVal(raw.UNRATE);        // already %
+    const fedRateVal  = latestVal(raw.FED_RATE);      // already %
+    const michVal     = latestVal(raw.MICH);          // already % expectation
+
+    // For Fed real rate: nominal fed rate minus core CPI YoY
+    const realFedRate = (fedRateVal !== null && coreCPIYoy !== null)
+      ? fedRateVal - coreCPIYoy : null;
+
+    // Compute scores — all inputs now in consistent % terms
     const scores = {
-      coreCPI: scoreCoreCPI(coreCPIVal),
+      coreCPI: scoreCoreCPI(coreCPIYoy),
       gdp:     scoreGDP(gdpVal),
       unrate:  scoreUnemployment(unrateVal),
       ppi:     scorePPI(ppiYoy),
-      fedRate: scoreFedRate(fedRateVal, coreCPIVal),
-      pce:     scoreCoreCPI(corePceVal || coreCPIVal),
+      fedRate: scoreFedRate(fedRateVal, coreCPIYoy),
+      pce:     scoreCoreCPI(corePceYoy ?? pceYoy ?? coreCPIYoy),
       mich:    scoreMich(michVal),
       m2:      scoreM2(m2Yoy)
     };
@@ -843,19 +852,21 @@ async function init() {
       return { text:`${sign}${d.toFixed(1)} vs prev`, cls };
     };
 
-    const prevCPI  = raw.CORE_CPI.length > 1 ? raw.CORE_CPI[raw.CORE_CPI.length-2]?.value : null;
-    const prevUn   = raw.UNRATE.length > 1   ? raw.UNRATE[raw.UNRATE.length-2]?.value : null;
-    const prevFed  = raw.FED_RATE.length > 1 ? raw.FED_RATE[raw.FED_RATE.length-2]?.value : null;
+    // For delta display: compute prev-period YoY by dropping last observation
+    const coreCPIPrevYoy = yoyChange(raw.CORE_CPI.slice(0, -1));
+    const prevUn         = raw.UNRATE.length > 1 ? raw.UNRATE[raw.UNRATE.length-2]?.value : null;
+    const ppiPrevYoy     = yoyChange(raw.PPI.slice(0, -1));
 
     // Build indicator cards
     const indicators = [
       {
         name:'Core CPI (ex-Food/Energy)', weight:22, score:scores.coreCPI, fredId:'CPILFESL',
-        displayVal: fmt(coreCPIVal), unit:'% YoY',
-        delta: fmtDelta(coreCPIVal, prevCPI).text, deltaClass: fmtDelta(coreCPIVal, prevCPI).cls,
+        displayVal: fmt(coreCPIYoy), unit:'% YoY',
+        delta: fmtDelta(coreCPIYoy, coreCPIPrevYoy).text,
+        deltaClass: fmtDelta(coreCPIYoy, coreCPIPrevYoy).cls,
         period: raw.CORE_CPI.length ? raw.CORE_CPI[raw.CORE_CPI.length-1].date : 'N/A',
         sparkData: sparkVals(raw.CORE_CPI).map(v=>v),
-        desc: `Core CPI (excludes food & energy). Fed's 2% target is the key benchmark. Current: ${fmt(coreCPIVal)}%. Above 3.5% significantly elevates stagflation risk.`
+        desc: `Core CPI YoY % (excludes food & energy). Fed's 2% target is the benchmark. Current: ${fmt(coreCPIYoy)}%. Above 3.5% significantly elevates stagflation risk.`
       },
       {
         name:'Real GDP Growth', weight:20, score:scores.gdp, fredId:'A191RL1Q225SBEA',
@@ -876,30 +887,30 @@ async function init() {
       },
       {
         name:'PPI — Producer Prices', weight:14, score:scores.ppi, fredId:'PPIFID',
-        displayVal: ppiYoy !== null ? fmt(ppiYoy) : '--', unit:'% YoY',
-        delta: ppiYoy !== null ? (ppiYoy > 3 ? '⚠ Accelerating' : '✓ Moderate') : 'N/A',
-        deltaClass: ppiYoy !== null ? (ppiYoy > 3 ? 'd-bad' : 'd-good') : 'd-none',
+        displayVal: fmt(ppiYoy), unit:'% YoY',
+        delta: fmtDelta(ppiYoy, ppiPrevYoy).text,
+        deltaClass: fmtDelta(ppiYoy, ppiPrevYoy).cls,
         period: raw.PPI.length ? raw.PPI[raw.PPI.length-1].date : 'N/A',
         sparkData: sparkVals(raw.PPI),
-        desc: `Producer Price Index year-over-year. Leads CPI by 3–6 months. Accelerating PPI = inflation pipeline is refilling. Current: ${ppiYoy !== null ? fmt(ppiYoy) : '--'}%.`
+        desc: `Producer Price Index YoY %. Leads CPI by 3–6 months. Accelerating PPI = inflation pipeline refilling. Current: ${fmt(ppiYoy)}%.`
       },
       {
         name:'Fed Funds Rate', weight:10, score:scores.fedRate, fredId:'FEDFUNDS',
         displayVal: fmt(fedRateVal), unit:'%',
-        delta: (fedRateVal !== null && coreCPIVal !== null) ? `Real: ${(fedRateVal-coreCPIVal).toFixed(1)}%` : 'N/A',
-        deltaClass: (fedRateVal !== null && coreCPIVal !== null) ? ((fedRateVal-coreCPIVal) > 0 ? 'd-good' : 'd-bad') : 'd-none',
+        delta: realFedRate !== null ? `Real: ${fmt(realFedRate)}%` : 'N/A',
+        deltaClass: realFedRate !== null ? (realFedRate > 0 ? 'd-good' : 'd-bad') : 'd-none',
         period: raw.FED_RATE.length ? raw.FED_RATE[raw.FED_RATE.length-1].date : 'N/A',
         sparkData: sparkVals(raw.FED_RATE),
-        desc: `Federal funds rate. The real rate (nominal minus core CPI) determines whether policy is genuinely restrictive. Real rate: ${fedRateVal !== null && coreCPIVal !== null ? fmt(fedRateVal-coreCPIVal) : '--'}%.`
+        desc: `Federal funds rate. Real rate = nominal minus core CPI YoY. Positive real rate = genuinely restrictive policy. Real rate now: ${fmt(realFedRate)}%.`
       },
       {
         name:'PCE Inflation (Core)', weight:8, score:scores.pce, fredId:'DPCERE1Q156NBEA',
-        displayVal: fmt(corePceVal), unit:'% ann.',
-        delta: corePceVal !== null ? (corePceVal > 2.5 ? '⚠ Above target' : '✓ Near target') : 'N/A',
-        deltaClass: corePceVal !== null ? (corePceVal > 2.5 ? 'd-warn' : 'd-good') : 'd-none',
+        displayVal: fmt(corePceYoy ?? pceYoy), unit:'% YoY',
+        delta: (corePceYoy ?? pceYoy) !== null ? ((corePceYoy ?? pceYoy) > 2.5 ? '⚠ Above target' : '✓ Near target') : 'N/A',
+        deltaClass: (corePceYoy ?? pceYoy) !== null ? ((corePceYoy ?? pceYoy) > 2.5 ? 'd-warn' : 'd-good') : 'd-none',
         period: raw.CORE_PCE.length ? raw.CORE_PCE[raw.CORE_PCE.length-1].date : 'N/A',
         sparkData: sparkVals(raw.CORE_PCE),
-        desc: `Core PCE is the Fed's preferred inflation measure. Constrains rate-cut flexibility when above 2%. Current: ${fmt(corePceVal)}%.`
+        desc: `Core PCE is the Fed's preferred inflation measure. Constrains rate-cut flexibility when above 2%. Current: ${fmt(corePceYoy ?? pceYoy)}%.`
       },
       {
         name:'Inflation Expectations (UMich)', weight:7, score:scores.mich, fredId:'MICH',
@@ -912,19 +923,19 @@ async function init() {
       },
       {
         name:'M2 Money Supply Growth', weight:6, score:scores.m2, fredId:'M2SL',
-        displayVal: m2Yoy !== null ? fmt(m2Yoy) : '--', unit:'% YoY',
+        displayVal: fmt(m2Yoy), unit:'% YoY',
         delta: m2Yoy !== null ? (m2Yoy > 5 ? '⚠ Fast growth' : '✓ Moderate') : 'N/A',
         deltaClass: m2Yoy !== null ? (m2Yoy > 5 ? 'd-bad' : 'd-good') : 'd-none',
         period: raw.M2.length ? raw.M2[raw.M2.length-1].date : 'N/A',
         sparkData: sparkVals(raw.M2),
-        desc: `M2 money supply year-over-year growth. Excess monetary growth adds inflationary impulse. Post-pandemic peak has normalized. Current: ${m2Yoy !== null ? fmt(m2Yoy) : '--'}%.`
+        desc: `M2 money supply YoY growth. Excess monetary growth adds inflationary impulse. Post-pandemic peak has normalized. Current: ${fmt(m2Yoy)}%.`
       }
     ];
 
     // RENDER EVERYTHING
     setLoadStatus('RENDERING DASHBOARD...', 96);
     renderComposite(composite, scores);
-    renderAlerts(buildAlerts({ coreCPI: coreCPIVal, gdpGrowth: gdpVal, unrate: unrateVal, ppiYoy, fedRate: fedRateVal, mich: michVal }));
+    renderAlerts(buildAlerts({ coreCPI: coreCPIYoy, gdpGrowth: gdpVal, unrate: unrateVal, ppiYoy, fedRate: fedRateVal, mich: michVal }));
     renderIndicators(indicators);
     renderOutlooks(composite);
     renderMethodology();
