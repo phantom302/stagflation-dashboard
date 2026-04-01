@@ -418,14 +418,16 @@ function scoreCoreCPI(val) {
 }
 
 function scoreGDP(val) {
-  // Lower growth = higher stagflation risk
-  if (val === null) return 50;
-  if (val >= 3.0) return 15;
-  if (val >= 2.0) return 30;
+  // val = 4-quarter average annualized real GDP growth
+  // Single weak quarter ≠ stagflation — sustained trend matters
+  if (val === null) return 45;
+  if (val >= 3.0) return 10;
+  if (val >= 2.0) return 25;
+  if (val >= 1.5) return 40;
   if (val >= 1.0) return 55;
-  if (val >= 0.0) return 72;
-  if (val >= -1.0) return 85;
-  return 95;
+  if (val >= 0.0) return 68;
+  if (val >= -1.0) return 82;
+  return 92;
 }
 
 function scoreUnemployment(val) {
@@ -818,8 +820,12 @@ async function init() {
     const pceYoy      = yoyChange(raw.PCE);          // PCEPI index → YoY%
     const corePceYoy  = yoyChange(raw.CORE_PCE);     // DPCERE1Q156NBEA → YoY%
 
-    // These FRED series are already percentage/rate values — use latest directly
-    const gdpVal      = latestVal(raw.GDP);           // already annualized %
+    // GDP: average last 4 quarters to avoid single-quarter distortion
+    // One weak quarter (e.g. Q4 2025 at 0.7%) ≠ sustained stagnation
+    const gdpRaw = raw.GDP.slice(-4).map(d => d.value).filter(v => !isNaN(v));
+    const gdpVal = gdpRaw.length > 0
+      ? gdpRaw.reduce((a, b) => a + b, 0) / gdpRaw.length
+      : null;
     const unrateVal   = latestVal(raw.UNRATE);        // already %
     const fedRateVal  = latestVal(raw.FED_RATE);      // already %
     const michVal     = latestVal(raw.MICH);          // already % expectation
@@ -857,6 +863,29 @@ async function init() {
     const prevUn         = raw.UNRATE.length > 1 ? raw.UNRATE[raw.UNRATE.length-2]?.value : null;
     const ppiPrevYoy     = yoyChange(raw.PPI.slice(0, -1));
 
+    // Debug: log all computed values to browser console for verification
+    console.table({
+      'Core CPI YoY %': coreCPIYoy?.toFixed(2),
+      'GDP 4Q Avg %':   gdpVal?.toFixed(2),
+      'Unemployment %': unrateVal?.toFixed(1),
+      'PPI YoY %':      ppiYoy?.toFixed(2),
+      'Fed Rate %':     fedRateVal?.toFixed(2),
+      'Real Fed Rate %':realFedRate?.toFixed(2),
+      'Michigan Exp %': michVal?.toFixed(1),
+      'M2 YoY %':       m2Yoy?.toFixed(2),
+      'Core PCE YoY %': (corePceYoy ?? pceYoy)?.toFixed(2),
+      '--- SCORES ---':  '',
+      'Score coreCPI':  scores.coreCPI,
+      'Score GDP':      scores.gdp,
+      'Score Unrate':   scores.unrate,
+      'Score PPI':      scores.ppi,
+      'Score FedRate':  scores.fedRate,
+      'Score PCE':      scores.pce,
+      'Score Mich':     scores.mich,
+      'Score M2':       scores.m2,
+      'COMPOSITE':      computeComposite(scores),
+    });
+
     // Build indicator cards
     const indicators = [
       {
@@ -875,7 +904,7 @@ async function init() {
         deltaClass: gdpVal !== null ? (gdpVal < 1.5 ? 'd-bad' : 'd-good') : 'd-none',
         period: raw.GDP.length ? raw.GDP[raw.GDP.length-1].date : 'N/A',
         sparkData: sparkVals(raw.GDP),
-        desc: `Real GDP annualized growth rate. Values below 1.5% signal stagnation; negative values confirm it. Current: ${fmt(gdpVal)}%.`
+        desc: `4-quarter average annualized real GDP growth (smoothed to avoid single-quarter distortion). Sustained values below 1.5% signal stagnation. Current 4Q avg: ${fmt(gdpVal)}%.`
       },
       {
         name:'Unemployment Rate', weight:13, score:scores.unrate, fredId:'UNRATE',
