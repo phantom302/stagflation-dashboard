@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stagflation Risk Monitor — US Economy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b0e;
+    --bg2: #0d1117;
+    --bg3: #121820;
+    --border: #1c2530;
+    --amber: #e8a020;
+    --amber-dim: #7a5010;
+    --red: #d94040;
+    --red-dim: #6e1e1e;
+    --green: #27ae60;
+    --green-dim: #164d2e;
+    --blue: #3a8fd4;
+    --muted: #3d4f60;
+    --text: #b8c9d8;
+    --text-dim: #5a6e80;
+    --white: #e8eef5;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Barlow',sans-serif; min-height:100vh; }
+
+  body::before {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999; opacity:.3;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  /* HEADER */
+  header {
+    position:sticky; top:0; z-index:100;
+    background:var(--bg2); border-bottom:1px solid var(--border);
+    padding:14px 28px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo { display:flex; flex-direction:column; }
+  .logo-title { font-family:'Barlow Condensed',sans-serif; font-weight:800; font-size:20px; letter-spacing:4px; text-transform:uppercase; color:var(--white); }
+  .logo-sub { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:2px; margin-top:2px; }
+  .header-right { display:flex; align-items:center; gap:16px; }
+  .live-badge {
+    display:flex; align-items:center; gap:7px;
+    font-family:'Space Mono',monospace; font-size:9px; letter-spacing:2px;
+    color:var(--green); background:rgba(39,174,96,0.07); border:1px solid rgba(39,174,96,0.2); padding:5px 10px;
+  }
+  .live-dot { width:6px; height:6px; background:var(--green); border-radius:50%; animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .last-updated { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); }
+
+  /* LOADING */
+  .loading-screen {
+    position:fixed; inset:0; background:var(--bg); z-index:500;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px;
+    transition:opacity 0.5s ease;
+  }
+  .loading-screen.hidden { opacity:0; pointer-events:none; }
+  .loading-title { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:22px; letter-spacing:4px; color:var(--white); }
+  .loading-bar-bg { width:320px; height:4px; background:var(--bg3); border:1px solid var(--border); overflow:hidden; }
+  .loading-bar-fill { height:100%; background:var(--amber); width:0%; transition:width 0.4s ease; }
+  .loading-status { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px; text-align:center; }
+
+  /* ERROR BANNER */
+  .error-banner {
+    display:none; background:rgba(217,64,64,0.08); border:1px solid var(--red-dim);
+    border-left:3px solid var(--red); margin:16px 28px; padding:12px 16px;
+    font-family:'Space Mono',monospace; font-size:10px; line-height:1.6;
+  }
+  .error-banner.show { display:block; }
+  .api-key-input-wrap { display:flex; gap:10px; margin-top:10px; }
+  .api-key-input {
+    flex:1; background:var(--bg3); border:1px solid var(--border); color:var(--white);
+    font-family:'Space Mono',monospace; font-size:11px; padding:8px 12px;
+    outline:none;
+  }
+  .api-key-input:focus { border-color:var(--amber); }
+  .api-key-btn {
+    background:var(--amber); color:#000; font-family:'Space Mono',monospace;
+    font-size:10px; font-weight:700; border:none; padding:8px 16px; cursor:pointer; letter-spacing:1px;
+  }
+  .api-key-btn:hover { background:#c88818; }
+
+  /* MAIN */
+  main { padding:20px 28px; max-width:1600px; margin:0 auto; }
+
+  /* HERO */
+  .hero { display:grid; grid-template-columns:340px 1fr; gap:14px; margin-bottom:14px; }
+
+  .score-card {
+    background:var(--bg2); border:1px solid var(--border); border-top:3px solid var(--amber);
+    padding:22px; position:relative; overflow:hidden;
+  }
+  .score-card::after {
+    content:''; position:absolute; bottom:-40px; right:-40px; width:150px; height:150px;
+    background:radial-gradient(circle,rgba(232,160,32,0.05) 0%,transparent 70%); pointer-events:none;
+  }
+  .score-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--text-dim); margin-bottom:8px; }
+  .score-row { display:flex; align-items:baseline; gap:5px; margin-bottom:4px; }
+  .score-number { font-family:'Barlow Condensed',sans-serif; font-size:82px; font-weight:800; line-height:1; color:var(--amber); transition:color 0.5s; }
+  .score-max { font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:300; color:var(--muted); align-self:flex-end; margin-bottom:6px; }
+  .risk-label-el { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; transition:color 0.5s; }
+  .risk-bar-bg { background:var(--bg3); border:1px solid var(--border); height:8px; border-radius:1px; overflow:hidden; margin-bottom:5px; }
+  .risk-bar-fill { height:100%; border-radius:1px; background:linear-gradient(90deg,#27ae60 0%,#e8a020 50%,#d94040 100%); transition:width 1.5s cubic-bezier(.16,1,.3,1); }
+  .risk-zones { display:flex; justify-content:space-between; font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); margin-bottom:14px; }
+  .score-quads { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+  .quad { background:var(--bg3); border:1px solid var(--border); padding:8px 11px; }
+  .quad-label { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); margin-bottom:3px; }
+  .quad-value { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; }
+
+  /* ALERTS */
+  .alerts-panel { background:var(--bg2); border:1px solid var(--border); padding:16px 18px; display:flex; flex-direction:column; gap:8px; }
+  .alerts-header { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:2px; }
+  .alert-item { display:flex; align-items:flex-start; gap:10px; padding:8px 11px; background:var(--bg3); border:1px solid var(--border); }
+  .alert-item.crit  { border-left:3px solid var(--red); }
+  .alert-item.warn  { border-left:3px solid var(--amber); }
+  .alert-item.watch { border-left:3px solid var(--blue); }
+  .alert-item.good  { border-left:3px solid var(--green); }
+  .alert-icon { font-size:12px; flex-shrink:0; margin-top:1px; }
+  .alert-text { font-size:12px; line-height:1.5; }
+  .alert-text strong { color:var(--white); }
+
+  /* SECTION */
+  .section-title {
+    font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11px;
+    letter-spacing:4px; text-transform:uppercase; color:var(--text-dim);
+    padding-bottom:8px; border-bottom:1px solid var(--border); margin-bottom:12px;
+  }
+
+  /* INDICATORS */
+  .ind-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+  .ind-card { background:var(--bg2); border:1px solid var(--border); padding:15px 17px; transition:border-color .2s; }
+  .ind-card:hover { border-color:var(--amber-dim); }
+  .ind-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:9px; }
+  .ind-name { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13px; letter-spacing:.5px; text-transform:uppercase; color:var(--white); line-height:1.2; }
+  .ind-wt { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); background:var(--bg3); border:1px solid var(--border); padding:2px 5px; flex-shrink:0; margin-left:6px; }
+  .pill { display:inline-block; font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; text-transform:uppercase; padding:2px 6px; margin-bottom:6px; border-radius:1px; }
+  .pill-crit { background:rgba(217,64,64,.12); color:var(--red); border:1px solid var(--red-dim); }
+  .pill-elev { background:rgba(232,160,32,.1); color:var(--amber); border:1px solid var(--amber-dim); }
+  .pill-mod  { background:rgba(232,160,32,.06); color:#9a6a10; border:1px solid #4a320a; }
+  .pill-low  { background:rgba(39,174,96,.08); color:var(--green); border:1px solid var(--green-dim); }
+  .pill-load { background:rgba(90,110,128,.1); color:var(--text-dim); border:1px solid var(--border); }
+  .val-row { display:flex; align-items:baseline; gap:7px; margin-bottom:7px; }
+  .val-big { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:700; line-height:1; transition:color .4s; }
+  .val-unit { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); }
+  .val-delta { margin-left:auto; font-family:'Space Mono',monospace; font-size:9px; padding:2px 6px; border-radius:1px; }
+  .d-bad  { color:var(--red);   background:rgba(217,64,64,.1); }
+  .d-warn { color:var(--amber); background:rgba(232,160,32,.1); }
+  .d-good { color:var(--green); background:rgba(39,174,96,.1); }
+  .d-none { color:var(--text-dim); background:var(--bg3); }
+  .bar-wrap { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+  .bar-bg { flex:1; height:5px; background:var(--bg3); border-radius:1px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:1px; transition:width 1.5s cubic-bezier(.16,1,.3,1); }
+  .bar-score { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); white-space:nowrap; }
+  .ind-desc { font-size:11px; color:var(--text-dim); line-height:1.5; padding-top:7px; border-top:1px solid var(--border); }
+  .src-line { font-family:'Space Mono',monospace; font-size:8px; color:#3a6a80; margin-top:3px; display:block; }
+
+  /* SPARKLINE */
+  .spark-wrap { height:34px; margin:6px 0; }
+  svg.spark { width:100%; height:34px; overflow:visible; }
+
+  /* LOADING SKELETON */
+  .skeleton { background:var(--bg3); border-radius:2px; animation:shimmer 1.5s infinite; }
+  @keyframes shimmer {
+    0%{opacity:.4} 50%{opacity:.8} 100%{opacity:.4}
+  }
+
+  /* OUTLOOK */
+  .outlook-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+  .outlook-card { background:var(--bg2); border:1px solid var(--border); padding:18px; position:relative; overflow:hidden; }
+  .outlook-card::before { content:attr(data-m); position:absolute; top:10px; right:12px; font-family:'Barlow Condensed',sans-serif; font-size:52px; font-weight:800; color:var(--border); line-height:1; pointer-events:none; }
+  .out-period { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px; }
+  .out-prob { font-family:'Barlow Condensed',sans-serif; font-size:46px; font-weight:800; line-height:1; margin-bottom:2px; }
+  .out-label { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:600; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+  .out-hr { border:none; border-top:1px solid var(--border); margin-bottom:10px; }
+  .out-action-title { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--text-dim); margin-bottom:7px; text-transform:uppercase; }
+  .actions { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .actions li { display:flex; gap:7px; font-size:12px; line-height:1.45; }
+  .actions li::before { content:'→'; font-family:'Space Mono',monospace; font-size:10px; color:var(--amber); flex-shrink:0; margin-top:1px; }
+  .out-note { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); padding:6px 9px; background:var(--bg3); border:1px solid var(--border); margin-top:8px; line-height:1.5; }
+
+  /* METHODOLOGY */
+  .meth-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
+  .meth-card { background:var(--bg2); border:1px solid var(--border); padding:13px 15px; }
+  .meth-rank { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; color:var(--text-dim); margin-bottom:3px; }
+  .meth-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:var(--white); margin-bottom:7px; }
+  .meth-bar-bg { height:3px; background:var(--bg3); margin-bottom:5px; }
+  .meth-bar-fill { height:100%; background:var(--amber); }
+  .meth-pct { font-family:'Space Mono',monospace; font-size:10px; color:var(--amber); margin-bottom:5px; }
+  .meth-desc { font-size:11px; color:var(--text-dim); line-height:1.5; }
+
+  footer {
+    margin-top:20px; padding:12px 28px; border-top:1px solid var(--border);
+    display:flex; justify-content:space-between;
+    font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim);
+    flex-wrap:wrap; gap:6px;
+  }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation:fadeUp .5s ease both; }
+
+  @media(max-width:1100px) { .ind-grid{grid-template-columns:repeat(2,1fr)} .meth-grid{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:768px)  { main{padding:12px} .hero,.ind-grid,.outlook-grid,.meth-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loader">
+  <div class="loading-title">LOADING LIVE DATA</div>
+  <div class="loading-bar-bg"><div class="loading-bar-fill" id="load-bar"></div></div>
+  <div class="loading-status" id="load-status">CONNECTING TO FRED API...</div>
+</div>
+
+<header>
+  <div class="logo">
+    <div class="logo-title">Stagflation Risk Monitor</div>
+    <div class="logo-sub">US ECONOMY · FRED API · AUTO-UPDATING</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><div class="live-dot"></div>FRED LIVE DATA</div>
+    <div class="last-updated" id="last-updated">Loading...</div>
+  </div>
+</header>
+
+<!-- API KEY ERROR / SETUP -->
+<div class="error-banner" id="error-banner">
+  <strong style="color:var(--white)">⚠ FRED API KEY REQUIRED</strong><br>
+  This dashboard fetches live data from the Federal Reserve Economic Data (FRED) API — it's free.<br>
+  Get your free key at <strong>fred.stlouisfed.org/docs/api/api_key.html</strong> (takes 30 seconds).<br>
+  Then paste it below:
+  <div class="api-key-input-wrap">
+    <input class="api-key-input" id="api-key-input" type="text" placeholder="Paste your FRED API key here (e.g. abcd1234ef567890...)">
+    <button class="api-key-btn" onclick="saveKeyAndReload()">SAVE & LOAD</button>
+  </div>
+</div>
+
+<main>
+  <!-- HERO -->
+  <div class="hero fade-in" id="hero-section">
+    <div class="score-card">
+      <div class="score-label">// Composite Stagflation Risk Index</div>
+      <div class="score-row">
+        <div class="score-number" id="comp-score">--</div>
+        <div class="score-max">/100</div>
+      </div>
+      <div class="risk-label-el" id="risk-label" style="color:var(--text-dim)">LOADING...</div>
+      <div class="risk-bar-bg"><div class="risk-bar-fill" id="main-bar" style="width:0%"></div></div>
+      <div class="risk-zones"><span>LOW 0–25</span><span>MODERATE 26–50</span><span>ELEVATED 51–75</span><span>CRITICAL 76–100</span></div>
+      <div class="score-quads">
+        <div class="quad"><div class="quad-label">Inflation Pressure</div><div class="quad-value" id="q-inf" style="color:var(--text-dim)">--</div></div>
+        <div class="quad"><div class="quad-label">Growth Stagnation</div><div class="quad-value" id="q-gdp" style="color:var(--text-dim)">--</div></div>
+        <div class="quad"><div class="quad-label">Labor Stress</div><div class="quad-value" id="q-lab" style="color:var(--text-dim)">--</div></div>
+        <div class="quad"><div class="quad-label">Producer Prices</div><div class="quad-value" id="q-ppi" style="color:var(--text-dim)">--</div></div>
+      </div>
+    </div>
+
+    <div class="alerts-panel">
+      <div class="alerts-header">// Dynamic Risk Signals — Updated from Live Data</div>
+      <div id="alerts-container">
+        <div class="alert-item watch"><div class="alert-icon">⏳</div><div class="alert-text">Fetching live indicators from FRED...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDICATORS -->
+  <div class="section-title">// Live Economic Indicators — FRED API</div>
+  <div class="ind-grid" id="ind-grid">
+    <!-- skeletons injected by JS -->
+  </div>
+
+  <!-- OUTLOOK -->
+  <div class="section-title">// Forward Outlook & Recommended Actions</div>
+  <div class="outlook-grid" id="outlook-grid"></div>
+
+  <!-- METHODOLOGY -->
+  <div class="section-title">// Indicator Weight Methodology</div>
+  <div class="meth-grid" id="meth-grid"></div>
+
+  <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);text-align:center;padding:8px;border-top:1px solid var(--border);margin-top:6px;">
+    DATA: FRED API (CPIAUCSL · CPILFESL · GDPC1 · UNRATE · PPIFID · MICH · DPCERE1Q156NBEA · M2SL) · UPDATES AUTOMATICALLY ON PAGE LOAD · NOT FINANCIAL ADVICE
+  </div>
+</main>
+
+<footer>
+  <span>STAGFLATION RISK MONITOR · FRED API BUILD · FOR INFORMATIONAL PURPOSES ONLY</span>
+  <span id="footer-ts"></span>
+</footer>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIG — FRED SERIES IDs
+// ════════════════════════════════════════════
+const FRED_SERIES = {
+  CPI:       'CPIAUCSL',      // All-items CPI YoY
+  CORE_CPI:  'CPILFESL',      // Core CPI (ex food & energy)
+  GDP:       'A191RL1Q225SBEA', // Real GDP growth rate (quarterly)
+  UNRATE:    'UNRATE',         // Unemployment rate
+  PPI:       'PPIFID',         // PPI Final Demand
+  M2:        'M2SL',           // M2 Money Supply
+  MICH:      'MICH',           // UMich Inflation Expectations
+  PCE:       'PCEPI',          // PCE Price Index
+  CORE_PCE:  'DPCERE1Q156NBEA', // Core PCE
+  FED_RATE:  'FEDFUNDS',       // Fed Funds Rate
+};
+
+// ════════════════════════════════════════════
+// API KEY MANAGEMENT
+// ════════════════════════════════════════════
+function getApiKey() {
+  // Check URL param first (easy sharing: ?key=YOURKEY)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('key')) {
+    localStorage.setItem('fred_api_key', params.get('key'));
+    return params.get('key');
+  }
+  return localStorage.getItem('fred_api_key') || '';
+}
+
+function saveKeyAndReload() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (key.length < 10) { alert('Please enter a valid FRED API key.'); return; }
+  localStorage.setItem('fred_api_key', key);
+  location.reload();
+}
+
+// ════════════════════════════════════════════
+// FETCH FRED DATA
+// ════════════════════════════════════════════
+async function fetchFredSeries(seriesId, apiKey, limit = 24) {
+  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=${limit}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`FRED API error: ${resp.status}`);
+  const data = await resp.json();
+  // Return array of {date, value} sorted oldest-first, excluding missing values
+  return data.observations
+    .filter(o => o.value !== '.' && o.value !== '')
+    .map(o => ({ date: o.date, value: parseFloat(o.value) }))
+    .reverse();
+}
+
+async function fetchAllData(apiKey) {
+  const keys = Object.keys(FRED_SERIES);
+  const results = {};
+  let loaded = 0;
+  const steps = keys.length;
+
+  for (const key of keys) {
+    setLoadStatus(`FETCHING ${key}...`, (loaded / steps) * 90);
+    try {
+      results[key] = await fetchFredSeries(FRED_SERIES[key], apiKey);
+    } catch (e) {
+      console.warn(`Failed to fetch ${key}:`, e);
+      results[key] = [];
+    }
+    loaded++;
+    setLoadStatus(`LOADED ${key} ✓`, (loaded / steps) * 90);
+  }
+  return results;
+}
+
+// ════════════════════════════════════════════
+// DATA PROCESSING
+// ════════════════════════════════════════════
+function latestVal(series) {
+  if (!series || series.length === 0) return null;
+  return series[series.length - 1].value;
+}
+
+function yoyChange(series) {
+  // Year-over-year % change from the series values
+  if (!series || series.length < 13) return null;
+  const latest = series[series.length - 1].value;
+  const yearAgo = series[series.length - 13]?.value;
+  if (!yearAgo) return null;
+  return ((latest - yearAgo) / Math.abs(yearAgo)) * 100;
+}
+
+function sparkVals(series, n = 12) {
+  if (!series || series.length === 0) return Array(n).fill(0);
+  return series.slice(-n).map(d => d.value);
+}
+
+// ════════════════════════════════════════════
+// RISK SCORING
+// ════════════════════════════════════════════
+function scoreCoreCPI(val) {
+  // Fed target 2%. Score rises with distance above 2%
+  if (val === null) return 50;
+  if (val <= 2.0) return 10;
+  if (val <= 2.5) return 30;
+  if (val <= 3.0) return 50;
+  if (val <= 3.5) return 65;
+  if (val <= 4.0) return 78;
+  if (val <= 5.0) return 88;
+  return 95;
+}
+
+function scoreGDP(val) {
+  // Lower growth = higher stagflation risk
+  if (val === null) return 50;
+  if (val >= 3.0) return 15;
+  if (val >= 2.0) return 30;
+  if (val >= 1.0) return 55;
+  if (val >= 0.0) return 72;
+  if (val >= -1.0) return 85;
+  return 95;
+}
+
+function scoreUnemployment(val) {
+  if (val === null) return 40;
+  if (val <= 3.5) return 15;
+  if (val <= 4.0) return 28;
+  if (val <= 4.5) return 40;
+  if (val <= 5.0) return 55;
+  if (val <= 6.0) return 72;
+  return 85;
+}
+
+function scorePPI(val) {
+  if (val === null) return 50;
+  if (val <= 2.0) return 20;
+  if (val <= 3.0) return 40;
+  if (val <= 4.0) return 58;
+  if (val <= 5.0) return 72;
+  if (val <= 7.0) return 85;
+  return 95;
+}
+
+function scoreFedRate(fedRate, coreCPI) {
+  if (fedRate === null || coreCPI === null) return 50;
+  const real = fedRate - coreCPI;
+  if (real > 2.0) return 10;
+  if (real > 1.0) return 25;
+  if (real > 0.0) return 42;
+  if (real > -1.0) return 60;
+  if (real > -2.0) return 78;
+  return 90;
+}
+
+function scoreMich(val) {
+  if (val === null) return 45;
+  if (val <= 2.5) return 10;
+  if (val <= 3.0) return 30;
+  if (val <= 3.5) return 48;
+  if (val <= 4.0) return 65;
+  if (val <= 5.0) return 80;
+  return 90;
+}
+
+function scoreM2(yoy) {
+  if (yoy === null) return 35;
+  if (yoy <= 2.0) return 15;
+  if (yoy <= 4.0) return 30;
+  if (yoy <= 6.0) return 50;
+  if (yoy <= 8.0) return 68;
+  if (yoy <= 12.0) return 82;
+  return 92;
+}
+
+function computeComposite(scores) {
+  const weights = {
+    coreCPI: 22, gdp: 20, ppi: 14, unrate: 13,
+    fedRate: 10, pce: 8, mich: 7, m2: 6
+  };
+  let total = 0, wtSum = 0;
+  for (const [key, w] of Object.entries(weights)) {
+    if (scores[key] !== undefined) { total += scores[key] * w; wtSum += w; }
+  }
+  return Math.round(total / wtSum);
+}
+
+function riskLabel(score) {
+  if (score <= 25) return { label: 'LOW RISK', color: '#27ae60' };
+  if (score <= 50) return { label: 'MODERATE RISK', color: '#e8a020' };
+  if (score <= 75) return { label: 'ELEVATED RISK', color: '#c06818' };
+  return { label: 'CRITICAL RISK', color: '#d94040' };
+}
+
+function statusFromScore(score) {
+  if (score >= 75) return { cls:'pill-crit', label:'CRITICAL', color:'#d94040' };
+  if (score >= 55) return { cls:'pill-elev', label:'ELEVATED', color:'#e8a020' };
+  if (score >= 35) return { cls:'pill-mod',  label:'MODERATE', color:'#9a6a10' };
+  return { cls:'pill-low', label:'LOW', color:'#27ae60' };
+}
+
+// ════════════════════════════════════════════
+// DYNAMIC ALERTS
+// ════════════════════════════════════════════
+function buildAlerts(d) {
+  const alerts = [];
+
+  const coreCPI = d.coreCPI, gdpGrowth = d.gdpGrowth, unrate = d.unrate;
+  const ppiYoy = d.ppiYoy, fedRate = d.fedRate, mich = d.mich;
+
+  if (coreCPI !== null) {
+    if (coreCPI > 3.5) alerts.push({ type:'crit', icon:'🔴', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — well above Fed's 2% target.</strong> Persistent inflation above 3.5% significantly elevates stagflation risk.` });
+    else if (coreCPI > 2.5) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — moderately above target.</strong> Still elevated but trending in right direction. Watch for reversal from oil shock pass-through.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — near multi-year lows.</strong> Key stagflation ingredient (entrenched inflation) currently absent.` });
+  }
+
+  if (gdpGrowth !== null) {
+    if (gdpGrowth < 0) alerts.push({ type:'crit', icon:'🔴', msg:`<strong>GDP contraction: ${gdpGrowth.toFixed(1)}% annualized.</strong> Simultaneous contraction + elevated inflation = textbook stagflation condition.` });
+    else if (gdpGrowth < 1.5) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Near-stall GDP growth: ${gdpGrowth.toFixed(1)}%.</strong> Insufficient growth to absorb cost-push inflation. Stagflation conditions building.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>GDP growth ${gdpGrowth.toFixed(1)}% — reasonable pace.</strong> Growth above stall speed reduces stagflation probability materially.` });
+  }
+
+  if (ppiYoy !== null && ppiYoy > 3.0) {
+    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>PPI at ${ppiYoy.toFixed(1)}% YoY — pipeline pressure building.</strong> Producer prices lead consumer inflation by 3–6 months. Accelerating trend warrants close monitoring.` });
+  }
+
+  if (mich !== null && mich > 3.5) {
+    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Consumer inflation expectations: ${mich.toFixed(1)}%.</strong> Above 3.5% suggests expectations de-anchoring from Fed's 2% target — a self-fulfilling inflation risk.` });
+  }
+
+  if (fedRate !== null && coreCPI !== null) {
+    const real = fedRate - coreCPI;
+    if (real < 0) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Negative real interest rate: ${real.toFixed(1)}%.</strong> Fed funds rate below inflation = monetary policy still accommodative despite tightening cycle.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>Real interest rate positive: +${real.toFixed(1)}%.</strong> Fed policy is genuinely restrictive — this is the primary anti-stagflation buffer.` });
+  }
+
+  if (unrate !== null && unrate < 5.0) {
+    alerts.push({ type:'good', icon:'🟢', msg:`<strong>Unemployment ${unrate.toFixed(1)}% — labor market still resilient.</strong> Stagflation historically requires high unemployment. Current labor strength is a key moderating factor.` });
+  }
+
+  // Default if no data
+  if (alerts.length === 0) {
+    alerts.push({ type:'watch', icon:'⏳', msg:'<strong>Insufficient data to generate dynamic alerts.</strong> Check FRED API connection.' });
+  }
+
+  return alerts;
+}
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+function renderSpark(data, color) {
+  if (!data || data.length < 2) return '<div class="spark-wrap" style="background:var(--bg3);opacity:.3"></div>';
+  const mn = Math.min(...data), mx = Math.max(...data), rng = mx - mn || 1;
+  const W = 200, H = 30;
+  const pts = data.map((v,i) => {
+    const x = (i/(data.length-1))*W, y = H - ((v-mn)/rng)*H;
+    return `${i===0?'M':'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const lastY = H - ((data[data.length-1]-mn)/rng)*H;
+  return `<div class="spark-wrap"><svg class="spark" viewBox="0 0 200 34" preserveAspectRatio="none">
+    <path d="${pts}" fill="none" stroke="${color}30" stroke-width="1.5"/>
+    <path d="${pts}" fill="none" stroke="${color}" stroke-width="1.5"/>
+    <circle cx="200" cy="${lastY.toFixed(1)}" r="2.5" fill="${color}"/>
+  </svg></div>`;
+}
+
+function renderIndicators(indicators) {
+  const grid = document.getElementById('ind-grid');
+  grid.innerHTML = '';
+  indicators.forEach(ind => {
+    const st = statusFromScore(ind.score);
+    const div = document.createElement('div');
+    div.className = 'ind-card fade-in';
+    div.innerHTML = `
+      <div class="ind-top">
+        <div class="ind-name">${ind.name}</div>
+        <div class="ind-wt">WT: ${ind.weight}%</div>
+      </div>
+      <span class="pill ${st.cls}">${st.label}</span>
+      <div class="val-row">
+        <div class="val-big" style="color:${st.color}">${ind.displayVal}</div>
+        <div class="val-unit">${ind.unit}</div>
+        <div class="val-delta ${ind.deltaClass}">${ind.delta}</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${st.color}" data-t="${ind.score}"></div></div>
+        <div class="bar-score">Risk: <strong>${ind.score}/100</strong></div>
+      </div>
+      ${renderSpark(ind.sparkData, st.color)}
+      <div class="ind-desc">${ind.desc}<span class="src-line">FRED: ${ind.fredId} · ${ind.period}</span></div>
+    `;
+    grid.appendChild(div);
+  });
+  // Animate bars
+  setTimeout(() => { document.querySelectorAll('.bar-fill[data-t]').forEach(b => b.style.width = b.dataset.t + '%'); }, 100);
+}
+
+function renderAlerts(alerts) {
+  const c = document.getElementById('alerts-container');
+  c.innerHTML = alerts.map(a => `
+    <div class="alert-item ${a.type}">
+      <div class="alert-icon">${a.icon}</div>
+      <div class="alert-text">${a.msg}</div>
+    </div>
+  `).join('');
+}
+
+function renderComposite(score, scores) {
+  const rl = riskLabel(score);
+  document.getElementById('comp-score').textContent = score;
+  document.getElementById('comp-score').style.color = rl.color;
+  const labelEl = document.getElementById('risk-label');
+  labelEl.textContent = rl.label;
+  labelEl.style.color = rl.color;
+  setTimeout(() => { document.getElementById('main-bar').style.width = score + '%'; }, 200);
+
+  // Quads
+  const qInf = scores.coreCPI || 50;
+  const qGdp = scores.gdp || 50;
+  const qLab = scores.unrate || 50;
+  const qPpi = scores.ppi || 50;
+
+  const qMap = (s) => {
+    if (s >= 70) return { label:'CRITICAL', color:'#d94040' };
+    if (s >= 50) return { label:'ELEVATED', color:'#e8a020' };
+    if (s >= 30) return { label:'MODERATE', color:'#9a6a10' };
+    return { label:'LOW', color:'#27ae60' };
+  };
+  [['q-inf',qInf],['q-gdp',qGdp],['q-lab',qLab],['q-ppi',qPpi]].forEach(([id,s]) => {
+    const q = qMap(s), el = document.getElementById(id);
+    el.textContent = q.label; el.style.color = q.color;
+  });
+}
+
+// ════════════════════════════════════════════
+// OUTLOOK (dynamic based on composite score)
+// ════════════════════════════════════════════
+function buildOutlooks(score) {
+  const prob3m = Math.max(5, Math.min(85, Math.round(score * 0.55)));
+  const prob6m = Math.max(10, Math.min(90, Math.round(score * 0.70)));
+  const prob9m = Math.max(15, Math.min(92, Math.round(score * 0.82)));
+
+  const levelColor = (p) => {
+    if (p >= 60) return '#d94040';
+    if (p >= 40) return '#c06818';
+    if (p >= 25) return '#e8a020';
+    return '#4a9fd4';
+  };
+  const levelLabel = (p) => {
+    if (p >= 60) return 'HIGH RISK';
+    if (p >= 40) return 'MODERATE–HIGH';
+    if (p >= 25) return 'MODERATE';
+    return 'LOW–MODERATE';
+  };
+
+  return [
+    {
+      period:'3-Month Outlook', dataM:'3M',
+      prob: prob3m + '%', label: levelLabel(prob3m), color: levelColor(prob3m),
+      actions: score >= 50 ? [
+        'Reduce long-duration bond exposure — inflation erodes fixed income returns',
+        'Increase TIPS (inflation-protected securities) allocation as near-term hedge',
+        'Lock in fixed rates on any variable-rate debt (mortgages, HELOCs) now',
+        'Build 3–6 month cash reserves — flexibility has asymmetric value in volatile conditions',
+        'Monitor energy prices weekly — oil trajectory is the single biggest swing factor'
+      ] : [
+        'No urgent repositioning required — maintain diversified portfolio',
+        'Consider modest TIPS or I-Bond allocation for inflation protection at low cost',
+        'Watch April CPI and FOMC for confirmation of direction',
+        'Ensure cash reserves are adequate (3+ months expenses) — standard prudence',
+        'No panic required: current data does not indicate imminent stagflation'
+      ],
+      note: 'KEY: Oil price trajectory and next CPI print (April 10) will set the 3-month risk tone.'
+    },
+    {
+      period:'6-Month Outlook', dataM:'6M',
+      prob: prob6m + '%', label: levelLabel(prob6m), color: levelColor(prob6m),
+      actions: score >= 50 ? [
+        'Tactically overweight energy sector equities for inflation pass-through',
+        'Real assets (commodities, REITs, infrastructure) start adding value above 3.5% PCE',
+        'Review business pricing strategy — input cost increases may accelerate',
+        'Short-duration bond ladder hedges against potential Fed rate hike scenario',
+        'International diversification into commodity-exporting economies (Canada, Australia)'
+      ] : [
+        'Maintain current allocation with modest tilt toward value and inflation-hedged assets',
+        'Consider sector rotation into healthcare and energy — both resilient in slow-growth environments',
+        'Review business cost structures for efficiency gains ahead of any tightening',
+        'Watch Fed Chair transition (May) for policy signal changes',
+        'Stress-test budget at +1% additional inflation above current baseline'
+      ],
+      note: 'BASE CASE: Growth ~2%+, inflation 2.5–3.5%. Stagflation "lite" — uncomfortable but not 1970s-style.'
+    },
+    {
+      period:'9-Month Outlook', dataM:'9M',
+      prob: prob9m + '%', label: levelLabel(prob9m), color: levelColor(prob9m),
+      actions: score >= 60 ? [
+        'Full defensive positioning: overweight commodities, energy, and inflation-linked securities',
+        'Healthcare, energy, and materials historically outperform in stagflationary periods',
+        'Evaluate leverage reduction — stagflation with rising rates makes debt servicing painful',
+        'Consult a fee-only fiduciary advisor for personalized asset-liability review',
+        'Monitor 5-year inflation expectations (UMich) — de-anchoring above 4% is critical trigger'
+      ] : [
+        'Stress-test portfolio across wide scenario range — outcomes still highly uncertain',
+        'Critical watchpoints: April 10 CPI, April 28–29 FOMC, May Fed Chair transition',
+        'If 5-year inflation expectations rise above 4%, escalate defensive positioning',
+        'Moody\'s Zandi flagged recession risk — ensure liquidity can absorb potential slowdown',
+        'Fee-only fiduciary review recommended for personalized planning at this uncertainty level'
+      ],
+      note: 'WIDE RANGE: 9-month outcome depends heavily on oil resolution, Fed chair transition, and summer data.'
+    }
+  ];
+}
+
+function renderOutlooks(score) {
+  const outlooks = buildOutlooks(score);
+  const grid = document.getElementById('outlook-grid');
+  grid.innerHTML = '';
+  outlooks.forEach(o => {
+    const div = document.createElement('div');
+    div.className = 'outlook-card fade-in';
+    div.setAttribute('data-m', o.dataM);
+    div.style.borderTop = `3px solid ${o.color}`;
+    div.innerHTML = `
+      <div class="out-period">${o.period}</div>
+      <div class="out-prob" style="color:${o.color}">${o.prob}</div>
+      <div class="out-label" style="color:${o.color}">${o.label}</div>
+      <hr class="out-hr">
+      <div class="out-action-title">Recommended Actions</div>
+      <ul class="actions">${o.actions.map(a=>`<li>${a}</li>`).join('')}</ul>
+      <div class="out-note">${o.note}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════
+// METHODOLOGY
+// ════════════════════════════════════════════
+const methodology = [
+  { rank:'01', name:'Core CPI',         weight:22, desc:'Primary Fed mandate metric. Persistent deviation above 2% is the central stagflation indicator.' },
+  { rank:'02', name:'Real GDP Growth',   weight:20, desc:'The "stagnation" component. Near-zero or negative growth concurrent with inflation = stagflation definition.' },
+  { rank:'03', name:'PPI',              weight:14, desc:'Leading inflation indicator (3–6 month lag to CPI). Acceleration is the most actionable forward signal.' },
+  { rank:'04', name:'Unemployment',     weight:13, desc:'Phillips curve breakdown. Stagflation requires rising unemployment alongside rising prices.' },
+  { rank:'05', name:'Fed Funds Rate',   weight:10, desc:'Real interest rate vs. inflation. Negative real rates = still inflationary despite nominal tightening.' },
+  { rank:'06', name:'PCE Inflation',    weight:8,  desc:"Fed's own preferred measure. Gap between PCE and 2% directly constrains rate cut flexibility." },
+  { rank:'07', name:'Inflation Expec.', weight:7,  desc:'Self-fulfilling cycle driver. 5-year expectation de-anchoring is Powell\'s stated key risk trigger.' },
+  { rank:'08', name:'M2 Money Supply',  weight:6,  desc:'Monetary inflation pressure. M2 growth well above nominal GDP growth adds inflationary impulse.' }
+];
+
+function renderMethodology() {
+  const grid = document.getElementById('meth-grid');
+  grid.innerHTML = '';
+  methodology.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'meth-card fade-in';
+    div.innerHTML = `
+      <div class="meth-rank">FACTOR ${m.rank}</div>
+      <div class="meth-name">${m.name}</div>
+      <div class="meth-bar-bg"><div class="meth-bar-fill" style="width:${m.weight*4}%"></div></div>
+      <div class="meth-pct">${m.weight}% weight</div>
+      <div class="meth-desc">${m.desc}</div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════
+// LOADING HELPERS
+// ════════════════════════════════════════════
+function setLoadStatus(msg, pct) {
+  document.getElementById('load-status').textContent = msg;
+  document.getElementById('load-bar').style.width = pct + '%';
+}
+
+function hideLoader() {
+  setLoadStatus('COMPLETE ✓', 100);
+  setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 400);
+}
+
+function showError(msg) {
+  const b = document.getElementById('error-banner');
+  b.classList.add('show');
+  hideLoader();
+}
+
+// ════════════════════════════════════════════
+// MAIN INIT
+// ════════════════════════════════════════════
+async function init() {
+  const apiKey = getApiKey();
+
+  if (!apiKey) {
+    showError('No API key found.');
+    renderMethodology();
+    return;
+  }
+
+  try {
+    setLoadStatus('CONNECTING TO FRED API...', 5);
+    const raw = await fetchAllData(apiKey);
+    setLoadStatus('COMPUTING RISK SCORES...', 92);
+
+    // Extract latest values
+    const coreCPIVal = latestVal(raw.CORE_CPI);
+    const gdpVal     = latestVal(raw.GDP);
+    const unrateVal  = latestVal(raw.UNRATE);
+    const ppiYoySeries = raw.PPI;
+    const ppiYoy     = yoyChange(raw.PPI);
+    const fedRateVal = latestVal(raw.FED_RATE);
+    const michVal    = latestVal(raw.MICH);
+    const m2Yoy      = yoyChange(raw.M2);
+    const pceVal     = latestVal(raw.PCE);
+    const corePceVal = latestVal(raw.CORE_PCE);
+
+    // Compute scores
+    const scores = {
+      coreCPI: scoreCoreCPI(coreCPIVal),
+      gdp:     scoreGDP(gdpVal),
+      unrate:  scoreUnemployment(unrateVal),
+      ppi:     scorePPI(ppiYoy),
+      fedRate: scoreFedRate(fedRateVal, coreCPIVal),
+      pce:     scoreCoreCPI(corePceVal || coreCPIVal),
+      mich:    scoreMich(michVal),
+      m2:      scoreM2(m2Yoy)
+    };
+
+    const composite = computeComposite(scores);
+
+    // Format helpers
+    const fmt = (v, dec=1) => v !== null ? v.toFixed(dec) : '--';
+    const fmtDelta = (v, prev) => {
+      if (v === null || prev === null) return { text:'N/A', cls:'d-none' };
+      const d = v - prev;
+      const sign = d > 0 ? '+' : '';
+      const cls = d > 0.1 ? 'd-bad' : d < -0.1 ? 'd-good' : 'd-warn';
+      return { text:`${sign}${d.toFixed(1)} vs prev`, cls };
+    };
+
+    const prevCPI  = raw.CORE_CPI.length > 1 ? raw.CORE_CPI[raw.CORE_CPI.length-2]?.value : null;
+    const prevUn   = raw.UNRATE.length > 1   ? raw.UNRATE[raw.UNRATE.length-2]?.value : null;
+    const prevFed  = raw.FED_RATE.length > 1 ? raw.FED_RATE[raw.FED_RATE.length-2]?.value : null;
+
+    // Build indicator cards
+    const indicators = [
+      {
+        name:'Core CPI (ex-Food/Energy)', weight:22, score:scores.coreCPI, fredId:'CPILFESL',
+        displayVal: fmt(coreCPIVal), unit:'% YoY',
+        delta: fmtDelta(coreCPIVal, prevCPI).text, deltaClass: fmtDelta(coreCPIVal, prevCPI).cls,
+        period: raw.CORE_CPI.length ? raw.CORE_CPI[raw.CORE_CPI.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.CORE_CPI).map(v=>v),
+        desc: `Core CPI (excludes food & energy). Fed's 2% target is the key benchmark. Current: ${fmt(coreCPIVal)}%. Above 3.5% significantly elevates stagflation risk.`
+      },
+      {
+        name:'Real GDP Growth', weight:20, score:scores.gdp, fredId:'A191RL1Q225SBEA',
+        displayVal: fmt(gdpVal), unit:'% ann.',
+        delta: gdpVal !== null ? (gdpVal < 1.5 ? '⚠ Near stall' : '✓ Adequate') : 'N/A',
+        deltaClass: gdpVal !== null ? (gdpVal < 1.5 ? 'd-bad' : 'd-good') : 'd-none',
+        period: raw.GDP.length ? raw.GDP[raw.GDP.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.GDP),
+        desc: `Real GDP annualized growth rate. Values below 1.5% signal stagnation; negative values confirm it. Current: ${fmt(gdpVal)}%.`
+      },
+      {
+        name:'Unemployment Rate', weight:13, score:scores.unrate, fredId:'UNRATE',
+        displayVal: fmt(unrateVal), unit:'%',
+        delta: fmtDelta(unrateVal, prevUn).text, deltaClass: fmtDelta(unrateVal, prevUn).cls,
+        period: raw.UNRATE.length ? raw.UNRATE[raw.UNRATE.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.UNRATE),
+        desc: `Unemployment rate. Stagflation historically requires sustained high unemployment (>5.5%) alongside high inflation. Current: ${fmt(unrateVal)}%.`
+      },
+      {
+        name:'PPI — Producer Prices', weight:14, score:scores.ppi, fredId:'PPIFID',
+        displayVal: ppiYoy !== null ? fmt(ppiYoy) : '--', unit:'% YoY',
+        delta: ppiYoy !== null ? (ppiYoy > 3 ? '⚠ Accelerating' : '✓ Moderate') : 'N/A',
+        deltaClass: ppiYoy !== null ? (ppiYoy > 3 ? 'd-bad' : 'd-good') : 'd-none',
+        period: raw.PPI.length ? raw.PPI[raw.PPI.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.PPI),
+        desc: `Producer Price Index year-over-year. Leads CPI by 3–6 months. Accelerating PPI = inflation pipeline is refilling. Current: ${ppiYoy !== null ? fmt(ppiYoy) : '--'}%.`
+      },
+      {
+        name:'Fed Funds Rate', weight:10, score:scores.fedRate, fredId:'FEDFUNDS',
+        displayVal: fmt(fedRateVal), unit:'%',
+        delta: (fedRateVal !== null && coreCPIVal !== null) ? `Real: ${(fedRateVal-coreCPIVal).toFixed(1)}%` : 'N/A',
+        deltaClass: (fedRateVal !== null && coreCPIVal !== null) ? ((fedRateVal-coreCPIVal) > 0 ? 'd-good' : 'd-bad') : 'd-none',
+        period: raw.FED_RATE.length ? raw.FED_RATE[raw.FED_RATE.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.FED_RATE),
+        desc: `Federal funds rate. The real rate (nominal minus core CPI) determines whether policy is genuinely restrictive. Real rate: ${fedRateVal !== null && coreCPIVal !== null ? fmt(fedRateVal-coreCPIVal) : '--'}%.`
+      },
+      {
+        name:'PCE Inflation (Core)', weight:8, score:scores.pce, fredId:'DPCERE1Q156NBEA',
+        displayVal: fmt(corePceVal), unit:'% ann.',
+        delta: corePceVal !== null ? (corePceVal > 2.5 ? '⚠ Above target' : '✓ Near target') : 'N/A',
+        deltaClass: corePceVal !== null ? (corePceVal > 2.5 ? 'd-warn' : 'd-good') : 'd-none',
+        period: raw.CORE_PCE.length ? raw.CORE_PCE[raw.CORE_PCE.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.CORE_PCE),
+        desc: `Core PCE is the Fed's preferred inflation measure. Constrains rate-cut flexibility when above 2%. Current: ${fmt(corePceVal)}%.`
+      },
+      {
+        name:'Inflation Expectations (UMich)', weight:7, score:scores.mich, fredId:'MICH',
+        displayVal: fmt(michVal), unit:'% 1-yr',
+        delta: michVal !== null ? (michVal > 3.5 ? '⚠ De-anchoring' : '✓ Anchored') : 'N/A',
+        deltaClass: michVal !== null ? (michVal > 3.5 ? 'd-bad' : 'd-good') : 'd-none',
+        period: raw.MICH.length ? raw.MICH[raw.MICH.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.MICH),
+        desc: `University of Michigan 1-year consumer inflation expectations. De-anchoring drives wage demands and pricing behavior. Current: ${fmt(michVal)}%.`
+      },
+      {
+        name:'M2 Money Supply Growth', weight:6, score:scores.m2, fredId:'M2SL',
+        displayVal: m2Yoy !== null ? fmt(m2Yoy) : '--', unit:'% YoY',
+        delta: m2Yoy !== null ? (m2Yoy > 5 ? '⚠ Fast growth' : '✓ Moderate') : 'N/A',
+        deltaClass: m2Yoy !== null ? (m2Yoy > 5 ? 'd-bad' : 'd-good') : 'd-none',
+        period: raw.M2.length ? raw.M2[raw.M2.length-1].date : 'N/A',
+        sparkData: sparkVals(raw.M2),
+        desc: `M2 money supply year-over-year growth. Excess monetary growth adds inflationary impulse. Post-pandemic peak has normalized. Current: ${m2Yoy !== null ? fmt(m2Yoy) : '--'}%.`
+      }
+    ];
+
+    // RENDER EVERYTHING
+    setLoadStatus('RENDERING DASHBOARD...', 96);
+    renderComposite(composite, scores);
+    renderAlerts(buildAlerts({ coreCPI: coreCPIVal, gdpGrowth: gdpVal, unrate: unrateVal, ppiYoy, fedRate: fedRateVal, mich: michVal }));
+    renderIndicators(indicators);
+    renderOutlooks(composite);
+    renderMethodology();
+
+    // Footer / last updated
+    const now = new Date();
+    const ts = now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-updated').textContent = 'Updated: ' + ts;
+    document.getElementById('footer-ts').textContent = 'LAST FETCH: ' + ts;
+
+    hideLoader();
+
+  } catch (err) {
+    console.error('FRED fetch error:', err);
+    if (err.message.includes('403') || err.message.includes('400')) {
+      showError('Invalid API key. Please check and re-enter.');
+    } else {
+      showError('Network error. Check your internet connection.');
+    }
+    renderMethodology();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
