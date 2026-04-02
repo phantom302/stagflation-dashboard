@@ -51,23 +51,6 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
   .last-updated { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); }
 
-  /* AUTO-REFRESH COUNTDOWN */
-  .refresh-badge {
-    display:flex; align-items:center; gap:7px;
-    font-family:'Space Mono',monospace; font-size:9px; letter-spacing:2px;
-    color:var(--text-dim); background:var(--bg3); border:1px solid var(--border); padding:5px 10px;
-    cursor:pointer; transition:border-color .2s, color .2s;
-  }
-  .refresh-badge:hover { border-color:var(--amber-dim); color:var(--amber); }
-  .refresh-icon { font-size:10px; }
-  #countdown-wrap { display:flex; align-items:center; gap:4px; }
-  #refresh-now-btn {
-    font-family:'Space Mono',monospace; font-size:8px; letter-spacing:1px;
-    background:none; border:1px solid var(--border); color:var(--text-dim);
-    padding:2px 6px; cursor:pointer; transition:all .2s;
-  }
-  #refresh-now-btn:hover { border-color:var(--amber); color:var(--amber); background:rgba(232,160,32,.06); }
-
   /* LOADING */
   .loading-screen {
     position:fixed; inset:0; background:var(--bg); z-index:500;
@@ -80,16 +63,6 @@
   .loading-bar-fill { height:100%; background:var(--amber); width:0%; transition:width 0.4s ease; }
   .loading-status { font-family:'Space Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:2px; text-align:center; }
 
-  /* SERIES HEALTH BANNER */
-  .health-banner {
-    display:none; margin:10px 28px 0;
-    background:rgba(232,160,32,0.06); border:1px solid var(--amber-dim);
-    border-left:3px solid var(--amber);
-    padding:10px 14px; font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); line-height:1.8;
-  }
-  .health-banner.show { display:block; }
-  .health-banner strong { color:var(--amber); }
-
   /* ERROR BANNER */
   .error-banner {
     display:none; background:rgba(217,64,64,0.08); border:1px solid var(--red-dim);
@@ -100,7 +73,8 @@
   .api-key-input-wrap { display:flex; gap:10px; margin-top:10px; }
   .api-key-input {
     flex:1; background:var(--bg3); border:1px solid var(--border); color:var(--white);
-    font-family:'Space Mono',monospace; font-size:11px; padding:8px 12px; outline:none;
+    font-family:'Space Mono',monospace; font-size:11px; padding:8px 12px;
+    outline:none;
   }
   .api-key-input:focus { border-color:var(--amber); }
   .api-key-btn {
@@ -183,65 +157,29 @@
   .ind-desc { font-size:11px; color:var(--text-dim); line-height:1.5; padding-top:7px; border-top:1px solid var(--border); }
   .src-line { font-family:'Space Mono',monospace; font-size:8px; color:#3a6a80; margin-top:3px; display:block; }
 
-  /* TREND ARROW */
-  .trend-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-  .trend-arrow { font-size:18px; line-height:1; flex-shrink:0; filter:drop-shadow(0 0 4px currentColor); }
-  .trend-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1px; }
-  .trend-up-bad    { color:#d94040; }
-  .trend-up-good   { color:#27ae60; }
-  .trend-down-good { color:#27ae60; }
-  .trend-down-bad  { color:#d94040; }
-  .trend-flat      { color:#5a6e80; }
-
-  /* DATE STAMP */
-  .date-stamp {
-    font-family:'Space Mono',monospace; font-size:8px; color:#3a5a6a;
-    background:var(--bg3); border:1px solid var(--border);
-    padding:2px 6px; display:inline-block; margin-bottom:6px;
-  }
-
   /* SPARKLINE */
-  .spark-wrap { height:52px; margin:6px 0; position:relative; }
-  svg.spark { width:100%; height:52px; overflow:visible; }
-  .spark-legend {
-    display:flex; gap:12px; margin-top:2px;
-    font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim);
-  }
-  .spark-legend span { display:flex; align-items:center; gap:4px; }
-  .leg-dot { width:6px; height:3px; border-radius:1px; display:inline-block; }
+  .spark-wrap { height:34px; margin:6px 0; }
+  svg.spark { width:100%; height:34px; overflow:visible; }
 
   /* LOADING SKELETON */
   .skeleton { background:var(--bg3); border-radius:2px; animation:shimmer 1.5s infinite; }
-  @keyframes shimmer { 0%{opacity:.4} 50%{opacity:.8} 100%{opacity:.4} }
+  @keyframes shimmer {
+    0%{opacity:.4} 50%{opacity:.8} 100%{opacity:.4}
+  }
 
-  /* SCENARIO SECTION */
-  .scenario-section { margin-bottom:14px; }
-  .scenario-intro {
-    font-size:13px; color:var(--text); line-height:1.6; margin-bottom:12px;
-    padding:12px 16px; background:var(--bg2); border:1px solid var(--border);
-    border-left:3px solid var(--amber);
-  }
-  .scenario-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
-  .scenario-card { background:var(--bg2); border:1px solid var(--border); padding:18px; position:relative; overflow:hidden; }
-  .sc-name { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
-  .sc-prob-row { display:flex; align-items:baseline; gap:6px; margin-bottom:10px; }
-  .sc-prob { font-family:'Barlow Condensed',sans-serif; font-size:44px; font-weight:800; line-height:1; }
-  .sc-prob-label { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:1px; }
-  .sc-bar-bg { height:6px; background:var(--bg3); border-radius:1px; overflow:hidden; margin-bottom:12px; }
-  .sc-bar-fill { height:100%; border-radius:1px; transition:width 1.5s cubic-bezier(.16,1,.3,1); }
-  .sc-conditions { font-size:11.5px; color:var(--text-dim); line-height:1.6; margin-bottom:10px; border-top:1px solid var(--border); padding-top:10px; }
-  .sc-conditions strong { color:var(--white); display:block; margin-bottom:4px; font-size:12px; }
-  .sc-actions { list-style:none; display:flex; flex-direction:column; gap:5px; }
-  .sc-actions li { display:flex; gap:7px; font-size:11.5px; line-height:1.4; color:var(--text); }
-  .sc-actions li::before { content:'→'; font-family:'Space Mono',monospace; font-size:10px; flex-shrink:0; margin-top:1px; }
-  .sc-sum-bar {
-    display:grid; grid-template-columns:repeat(3,1fr);
-    background:var(--bg2); border:1px solid var(--border); overflow:hidden; margin-bottom:14px;
-  }
-  .sc-sum-item { padding:10px 14px; text-align:center; border-right:1px solid var(--border); }
-  .sc-sum-item:last-child { border-right:none; }
-  .sc-sum-label { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); margin-bottom:4px; letter-spacing:1px; }
-  .sc-sum-val { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; }
+  /* OUTLOOK */
+  .outlook-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:14px; }
+  .outlook-card { background:var(--bg2); border:1px solid var(--border); padding:18px; position:relative; overflow:hidden; }
+  .outlook-card::before { content:attr(data-m); position:absolute; top:10px; right:12px; font-family:'Barlow Condensed',sans-serif; font-size:52px; font-weight:800; color:var(--border); line-height:1; pointer-events:none; }
+  .out-period { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px; }
+  .out-prob { font-family:'Barlow Condensed',sans-serif; font-size:46px; font-weight:800; line-height:1; margin-bottom:2px; }
+  .out-label { font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:600; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+  .out-hr { border:none; border-top:1px solid var(--border); margin-bottom:10px; }
+  .out-action-title { font-family:'Space Mono',monospace; font-size:8px; letter-spacing:2px; color:var(--text-dim); margin-bottom:7px; text-transform:uppercase; }
+  .actions { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .actions li { display:flex; gap:7px; font-size:12px; line-height:1.45; }
+  .actions li::before { content:'→'; font-family:'Space Mono',monospace; font-size:10px; color:var(--amber); flex-shrink:0; margin-top:1px; }
+  .out-note { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); padding:6px 9px; background:var(--bg3); border:1px solid var(--border); margin-top:8px; line-height:1.5; }
 
   /* METHODOLOGY */
   .meth-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px; }
@@ -263,6 +201,72 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   .fade-in { animation:fadeUp .5s ease both; }
 
+  /* TREND ARROW */
+  .trend-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .trend-arrow {
+    font-size:18px; line-height:1; flex-shrink:0;
+    filter:drop-shadow(0 0 4px currentColor);
+  }
+  .trend-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1px; }
+  .trend-up-bad  { color:#d94040; }
+  .trend-up-good { color:#27ae60; }
+  .trend-down-good { color:#27ae60; }
+  .trend-down-bad  { color:#d94040; }
+  .trend-flat { color:#5a6e80; }
+
+  /* DATE STAMP */
+  .date-stamp {
+    font-family:'Space Mono',monospace; font-size:8px; color:#3a5a6a;
+    background:var(--bg3); border:1px solid var(--border);
+    padding:2px 6px; display:inline-block; margin-bottom:6px;
+  }
+
+  /* SPARKLINE WITH 1970S REFERENCE */
+  .spark-wrap { height:52px; margin:6px 0; position:relative; }
+  svg.spark { width:100%; height:52px; overflow:visible; }
+  .spark-legend {
+    display:flex; gap:12px; margin-top:2px;
+    font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim);
+  }
+  .spark-legend span { display:flex; align-items:center; gap:4px; }
+  .leg-dot { width:6px; height:3px; border-radius:1px; display:inline-block; }
+
+  /* SCENARIO SECTION */
+  .scenario-section { margin-bottom:14px; }
+  .scenario-intro {
+    font-size:13px; color:var(--text); line-height:1.6; margin-bottom:12px;
+    padding:12px 16px; background:var(--bg2); border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+  }
+  .scenario-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:12px; }
+  .scenario-card {
+    background:var(--bg2); border:1px solid var(--border);
+    padding:18px; position:relative; overflow:hidden;
+  }
+  .scenario-card::after {
+    content:''; position:absolute; inset:0; opacity:.03;
+    pointer-events:none;
+  }
+  .sc-name { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .sc-prob-row { display:flex; align-items:baseline; gap:6px; margin-bottom:10px; }
+  .sc-prob { font-family:'Barlow Condensed',sans-serif; font-size:44px; font-weight:800; line-height:1; }
+  .sc-prob-label { font-family:'Space Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:1px; }
+  .sc-bar-bg { height:6px; background:var(--bg3); border-radius:1px; overflow:hidden; margin-bottom:12px; }
+  .sc-bar-fill { height:100%; border-radius:1px; transition:width 1.5s cubic-bezier(.16,1,.3,1); }
+  .sc-conditions { font-size:11.5px; color:var(--text-dim); line-height:1.6; margin-bottom:10px; border-top:1px solid var(--border); padding-top:10px; }
+  .sc-conditions strong { color:var(--white); display:block; margin-bottom:4px; font-size:12px; }
+  .sc-actions { list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .sc-actions li { display:flex; gap:7px; font-size:11.5px; line-height:1.4; color:var(--text); }
+  .sc-actions li::before { content:'→'; font-family:'Space Mono',monospace; font-size:10px; flex-shrink:0; margin-top:1px; }
+  .sc-sum-bar {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    background:var(--bg2); border:1px solid var(--border); overflow:hidden; margin-bottom:14px;
+  }
+  .sc-sum-item { padding:10px 14px; text-align:center; border-right:1px solid var(--border); }
+  .sc-sum-item:last-child { border-right:none; }
+  .sc-sum-label { font-family:'Space Mono',monospace; font-size:8px; color:var(--text-dim); margin-bottom:4px; letter-spacing:1px; }
+  .sc-sum-val { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:700; }
+
   /* MOBILE */
   @media(max-width:1100px) {
     .ind-grid{grid-template-columns:repeat(2,1fr)}
@@ -278,13 +282,13 @@
     .logo-title{font-size:16px;letter-spacing:2px}
     .hero{grid-template-columns:1fr}
     .ind-grid{grid-template-columns:1fr}
-    .scenario-grid{grid-template-columns:1fr}
+    .outlook-grid{grid-template-columns:1fr}
     .meth-grid{grid-template-columns:1fr}
+    .scenario-grid{grid-template-columns:1fr}
     .sc-sum-bar{grid-template-columns:1fr}
     .score-number{font-size:68px}
     .header-right{gap:8px}
     .last-updated{display:none}
-    .refresh-badge{display:none}
   }
 </style>
 </head>
@@ -300,22 +304,13 @@
 <header>
   <div class="logo">
     <div class="logo-title">Stagflation Risk Monitor</div>
-    <div class="logo-sub">US ECONOMY · FRED API · AUTO-UPDATING EVERY 12H</div>
+    <div class="logo-sub">US ECONOMY · FRED API · AUTO-UPDATING</div>
   </div>
   <div class="header-right">
-    <!-- Auto-refresh countdown -->
-    <div class="refresh-badge" title="Click to refresh now" onclick="triggerManualRefresh()">
-      <span class="refresh-icon">⟳</span>
-      <div id="countdown-wrap">NEXT REFRESH: <span id="countdown">12:00:00</span></div>
-    </div>
-    <button id="refresh-now-btn" onclick="triggerManualRefresh()" title="Refresh data now">REFRESH NOW</button>
     <div class="live-badge"><div class="live-dot"></div>FRED LIVE DATA</div>
     <div class="last-updated" id="last-updated">Loading...</div>
   </div>
 </header>
-
-<!-- SERIES HEALTH BANNER -->
-<div class="health-banner" id="health-banner"></div>
 
 <!-- API KEY ERROR / SETUP -->
 <div class="error-banner" id="error-banner">
@@ -359,7 +354,9 @@
 
   <!-- INDICATORS -->
   <div class="section-title">// Live Economic Indicators — FRED API</div>
-  <div class="ind-grid" id="ind-grid"></div>
+  <div class="ind-grid" id="ind-grid">
+    <!-- skeletons injected by JS -->
+  </div>
 
   <!-- SCENARIO BREAKDOWN -->
   <div class="section-title">// Scenario Probability Breakdown — 3 Outcomes</div>
@@ -370,7 +367,7 @@
   <div class="meth-grid" id="meth-grid"></div>
 
   <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--text-dim);text-align:center;padding:8px;border-top:1px solid var(--border);margin-top:6px;">
-    DATA: FRED API (CPIAUCSL · CPILFESL · A191RL1Q225SBEA · UNRATE · PPIFID/PPIACO · MICH · DPCERE1Q156NBEA · M2SL) · AUTO-REFRESHES EVERY 12 HOURS · NOT FINANCIAL ADVICE
+    DATA: FRED API (CPIAUCSL · CPILFESL · GDPC1 · UNRATE · PPIFID · MICH · DPCERE1Q156NBEA · M2SL) · UPDATES AUTOMATICALLY ON PAGE LOAD · NOT FINANCIAL ADVICE
   </div>
 </main>
 
@@ -380,83 +377,27 @@
 </footer>
 
 <script>
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // CONFIG — FRED SERIES IDs
-// Note: PPIFID → PPIACO fallback handled in fetch logic
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 const FRED_SERIES = {
-  CPI:       'CPIAUCSL',           // All-items CPI (index, monthly)
-  CORE_CPI:  'CPILFESL',           // Core CPI ex food & energy (index, monthly)
-  GDP:       'A191RL1Q225SBEA',    // Real GDP growth rate, annualized % (quarterly)
-  UNRATE:    'UNRATE',             // Unemployment rate % (monthly)
-  PPI:       'PPIFID',             // PPI Final Demand (index, monthly) — fallback PPIACO
-  PPI_ALT:   'PPIACO',             // PPI All Commodities fallback
-  M2:        'M2SL',               // M2 Money Supply (index, monthly)
-  MICH:      'MICH',               // UMich Inflation Expectations % (monthly)
-  PCE:       'PCEPI',              // PCE Price Index (index, monthly)
-  CORE_PCE:  'DPCERE1Q156NBEA',    // Core PCE (index, QUARTERLY ← key fix)
-  FED_RATE:  'FEDFUNDS',           // Fed Funds Rate % (monthly)
+  CPI:       'CPIAUCSL',      // All-items CPI YoY
+  CORE_CPI:  'CPILFESL',      // Core CPI (ex food & energy)
+  GDP:       'A191RL1Q225SBEA', // Real GDP growth rate (quarterly)
+  UNRATE:    'UNRATE',         // Unemployment rate
+  PPI:       'PPIFID',         // PPI Final Demand
+  M2:        'M2SL',           // M2 Money Supply
+  MICH:      'MICH',           // UMich Inflation Expectations
+  PCE:       'PCEPI',          // PCE Price Index
+  CORE_PCE:  'DPCERE1Q156NBEA', // Core PCE
+  FED_RATE:  'FEDFUNDS',       // Fed Funds Rate
 };
 
-// Series frequency metadata (needed for correct YoY lookback)
-// 'M' = monthly (12 obs/year), 'Q' = quarterly (4 obs/year), 'A' = annual
-const SERIES_FREQ = {
-  CPI:      'M', CORE_CPI: 'M', GDP: 'Q', UNRATE: 'M',
-  PPI:      'M', PPI_ALT:  'M', M2: 'M', MICH:   'M',
-  PCE:      'M', CORE_PCE: 'Q', FED_RATE: 'M',
-};
-
-// ════════════════════════════════════════════════════════════════
-// AUTO-REFRESH STATE — 12 hours
-// ════════════════════════════════════════════════════════════════
-const REFRESH_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12 hours
-let refreshTimer     = null;
-let countdownTimer   = null;
-let nextRefreshAt    = null;
-
-function scheduleAutoRefresh() {
-  clearTimeout(refreshTimer);
-  clearInterval(countdownTimer);
-
-  nextRefreshAt = Date.now() + REFRESH_INTERVAL_MS;
-
-  // Update countdown display every second
-  countdownTimer = setInterval(() => {
-    const remaining = Math.max(0, nextRefreshAt - Date.now());
-    const h = Math.floor(remaining / 3_600_000);
-    const m = Math.floor((remaining % 3_600_000) / 60_000);
-    const s = Math.floor((remaining % 60_000) / 1_000);
-    document.getElementById('countdown').textContent =
-      `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  }, 1000);
-
-  // Full refresh after 12 hours
-  refreshTimer = setTimeout(() => {
-    clearInterval(countdownTimer);
-    triggerAutoRefresh();
-  }, REFRESH_INTERVAL_MS);
-}
-
-async function triggerAutoRefresh() {
-  console.log('[AutoRefresh] 12-hour interval triggered — re-fetching data');
-  // Show the loading screen briefly (non-blocking feel)
-  const loader = document.getElementById('loader');
-  loader.classList.remove('hidden');
-  document.getElementById('load-bar').style.width = '0%';
-  await init(true); // silent = false → full UI refresh
-  scheduleAutoRefresh();
-}
-
-function triggerManualRefresh() {
-  clearTimeout(refreshTimer);
-  clearInterval(countdownTimer);
-  triggerAutoRefresh();
-}
-
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // API KEY MANAGEMENT
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 function getApiKey() {
+  // Check URL param first (easy sharing: ?key=YOURKEY)
   const params = new URLSearchParams(window.location.search);
   if (params.get('key')) {
     localStorage.setItem('fred_api_key', params.get('key'));
@@ -472,17 +413,20 @@ function saveKeyAndReload() {
   location.reload();
 }
 
-// ════════════════════════════════════════════════════════════════
-// CORS PROXY FETCH WITH FALLBACK
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// FETCH FRED DATA — CORS PROXY WITH FALLBACK
+// ════════════════════════════════════════════
+
+// Three proxy options tried in order — if one is down the next kicks in automatically
 const CORS_PROXIES = [
   (url) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   (url) => `https://thingproxy.freeboard.io/fetch/${url}`,
 ];
 
-async function fetchFredSeries(seriesId, apiKey, limit = 30) {
+async function fetchFredSeries(seriesId, apiKey, limit = 24) {
   const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKey}&file_type=json&sort_order=desc&limit=${limit}`;
+
   let lastError;
   for (const proxyFn of CORS_PROXIES) {
     try {
@@ -491,12 +435,10 @@ async function fetchFredSeries(seriesId, apiKey, limit = 30) {
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       if (!data.observations) throw new Error('No observations in response');
-      const obs = data.observations
+      return data.observations
         .filter(o => o.value !== '.' && o.value !== '')
         .map(o => ({ date: o.date, value: parseFloat(o.value) }))
         .reverse();
-      if (obs.length === 0) throw new Error('All observations were missing/dot values');
-      return obs;
     } catch (e) {
       console.warn(`Proxy failed for ${seriesId}:`, e.message);
       lastError = e;
@@ -505,107 +447,53 @@ async function fetchFredSeries(seriesId, apiKey, limit = 30) {
   throw new Error(`All proxies failed for ${seriesId}: ${lastError?.message}`);
 }
 
-// ════════════════════════════════════════════════════════════════
-// FETCH ALL — with PPI fallback + health check
-// ════════════════════════════════════════════════════════════════
 async function fetchAllData(apiKey) {
-  const keys = ['CPI', 'CORE_CPI', 'GDP', 'UNRATE', 'PPI', 'M2', 'MICH', 'PCE', 'CORE_PCE', 'FED_RATE'];
+  const keys = Object.keys(FRED_SERIES);
   const results = {};
-  const failed  = [];
   let loaded = 0;
+  const steps = keys.length;
 
   for (const key of keys) {
-    setLoadStatus(`FETCHING ${key}...`, 5 + (loaded / keys.length) * 85);
+    setLoadStatus(`FETCHING ${key}...`, (loaded / steps) * 90);
     try {
-      results[key] = await fetchFredSeries(FRED_SERIES[key], apiKey, 30);
+      results[key] = await fetchFredSeries(FRED_SERIES[key], apiKey);
     } catch (e) {
-      // PPI-specific fallback: try PPIACO if PPIFID fails
-      if (key === 'PPI') {
-        try {
-          console.warn('PPIFID failed — trying PPIACO fallback');
-          results[key] = await fetchFredSeries(FRED_SERIES['PPI_ALT'], apiKey, 30);
-          failed.push(`PPI (using PPIACO fallback — PPIFID unavailable)`);
-        } catch (e2) {
-          console.error('PPI fallback also failed:', e2.message);
-          results[key] = [];
-          failed.push(`PPI — data unavailable (both PPIFID and PPIACO failed)`);
-        }
-      } else {
-        console.warn(`Failed to fetch ${key}:`, e);
-        results[key] = [];
-        failed.push(key);
-      }
+      console.warn(`Failed to fetch ${key}:`, e);
+      results[key] = [];
     }
     loaded++;
-    setLoadStatus(`LOADED ${key} ✓`, 5 + (loaded / keys.length) * 85);
+    setLoadStatus(`LOADED ${key} ✓`, (loaded / steps) * 90);
   }
-
-  // Surface health warnings
-  renderHealthBanner(results, failed);
   return results;
 }
 
-// ════════════════════════════════════════════════════════════════
-// FIX #1 — FREQUENCY-AWARE YoY COMPUTATION
-// Monthly series: look back 12 observations for 1 year
-// Quarterly series: look back 4 observations for 1 year
-// ════════════════════════════════════════════════════════════════
-function yoyChange(series, freq = 'M') {
-  const lookback = freq === 'Q' ? 4 : 12;
-  if (!series || series.length < lookback + 1) return null;
-  const latest  = series[series.length - 1].value;
-  const yearAgo = series[series.length - 1 - lookback]?.value;
-  if (yearAgo == null || isNaN(yearAgo) || yearAgo === 0) return null;
-  return ((latest - yearAgo) / Math.abs(yearAgo)) * 100;
-}
-
+// ════════════════════════════════════════════
+// DATA PROCESSING
+// ════════════════════════════════════════════
 function latestVal(series) {
   if (!series || series.length === 0) return null;
   return series[series.length - 1].value;
 }
 
-// ════════════════════════════════════════════════════════════════
-// FIX #3 — SPARKLINE YoY% — always show YoY% for index series,
-// regardless of observation count (graceful fallback to raw if insufficient)
-// ════════════════════════════════════════════════════════════════
-function computeYoySeries(series, freq = 'M') {
-  const lookback = freq === 'Q' ? 4 : 12;
-  if (!series || series.length < lookback + 2) return null; // not enough data
-  const result = [];
-  for (let i = lookback; i < series.length; i++) {
-    const curr = series[i].value;
-    const prev = series[i - lookback].value;
-    if (prev !== 0 && !isNaN(prev) && !isNaN(curr)) {
-      result.push({ date: series[i].date, value: ((curr - prev) / Math.abs(prev)) * 100 });
-    }
-  }
-  return result.length >= 3 ? result : null; // need at least 3 points to plot
+function yoyChange(series) {
+  // Year-over-year % change from the series values
+  if (!series || series.length < 13) return null;
+  const latest = series[series.length - 1].value;
+  const yearAgo = series[series.length - 13]?.value;
+  if (!yearAgo) return null;
+  return ((latest - yearAgo) / Math.abs(yearAgo)) * 100;
 }
 
-// ════════════════════════════════════════════════════════════════
-// FIX #2 — SERIES HEALTH BANNER
-// ════════════════════════════════════════════════════════════════
-function renderHealthBanner(results, failed) {
-  const banner = document.getElementById('health-banner');
-  const empty  = Object.entries(results).filter(([k, v]) => v.length === 0).map(([k]) => k);
-  const short  = Object.entries(results).filter(([k, v]) => v.length > 0 && v.length < 15).map(([k, v]) => `${k} (${v.length} obs)`);
-
-  const issues = [];
-  if (failed.length > 0) issues.push(`<strong>FETCH FAILED:</strong> ${failed.join(' · ')}`);
-  if (short.length  > 0) issues.push(`<strong>SHORT SERIES (may affect YoY calc):</strong> ${short.join(' · ')}`);
-
-  if (issues.length > 0) {
-    banner.innerHTML = `⚠ SERIES HEALTH CHECK — ${issues.join(' &nbsp;|&nbsp; ')} &nbsp;— Affected indicators will show "--" and use fallback scores.`;
-    banner.classList.add('show');
-  } else {
-    banner.classList.remove('show');
-  }
+function sparkVals(series, n = 12) {
+  if (!series || series.length === 0) return Array(n).fill(0);
+  return series.slice(-n).map(d => d.value);
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // RISK SCORING
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 function scoreCoreCPI(val) {
+  // Fed target 2%. Score rises with distance above 2%
   if (val === null) return 50;
   if (val <= 2.0) return 10;
   if (val <= 2.5) return 30;
@@ -617,6 +505,8 @@ function scoreCoreCPI(val) {
 }
 
 function scoreGDP(val) {
+  // val = 4-quarter average annualized real GDP growth
+  // Single weak quarter ≠ stagflation — sustained trend matters
   if (val === null) return 45;
   if (val >= 3.0) return 10;
   if (val >= 2.0) return 25;
@@ -691,29 +581,92 @@ function computeComposite(scores) {
 }
 
 function riskLabel(score) {
-  if (score <= 25) return { label: 'LOW RISK',      color: '#27ae60' };
+  if (score <= 25) return { label: 'LOW RISK', color: '#27ae60' };
   if (score <= 50) return { label: 'MODERATE RISK', color: '#e8a020' };
   if (score <= 75) return { label: 'ELEVATED RISK', color: '#c06818' };
-  return              { label: 'CRITICAL RISK',  color: '#d94040' };
+  return { label: 'CRITICAL RISK', color: '#d94040' };
 }
 
 function statusFromScore(score) {
   if (score >= 75) return { cls:'pill-crit', label:'CRITICAL', color:'#d94040' };
   if (score >= 55) return { cls:'pill-elev', label:'ELEVATED', color:'#e8a020' };
   if (score >= 35) return { cls:'pill-mod',  label:'MODERATE', color:'#9a6a10' };
-  return               { cls:'pill-low',  label:'LOW',      color:'#27ae60' };
+  return { cls:'pill-low', label:'LOW', color:'#27ae60' };
 }
 
-// ════════════════════════════════════════════════════════════════
-// TREND DETECTION
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// DYNAMIC ALERTS
+// ════════════════════════════════════════════
+function buildAlerts(d) {
+  const alerts = [];
+
+  const coreCPI = d.coreCPI, gdpGrowth = d.gdpGrowth, unrate = d.unrate;
+  const ppiYoy = d.ppiYoy, fedRate = d.fedRate, mich = d.mich;
+
+  if (coreCPI !== null) {
+    if (coreCPI > 3.5) alerts.push({ type:'crit', icon:'🔴', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — well above Fed's 2% target.</strong> Persistent inflation above 3.5% significantly elevates stagflation risk.` });
+    else if (coreCPI > 2.5) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — moderately above target.</strong> Still elevated but trending in right direction. Watch for reversal from oil shock pass-through.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — near multi-year lows.</strong> Key stagflation ingredient (entrenched inflation) currently absent.` });
+  }
+
+  if (gdpGrowth !== null) {
+    if (gdpGrowth < 0) alerts.push({ type:'crit', icon:'🔴', msg:`<strong>GDP contraction: ${gdpGrowth.toFixed(1)}% annualized.</strong> Simultaneous contraction + elevated inflation = textbook stagflation condition.` });
+    else if (gdpGrowth < 1.5) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Near-stall GDP growth: ${gdpGrowth.toFixed(1)}%.</strong> Insufficient growth to absorb cost-push inflation. Stagflation conditions building.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>GDP growth ${gdpGrowth.toFixed(1)}% — reasonable pace.</strong> Growth above stall speed reduces stagflation probability materially.` });
+  }
+
+  if (ppiYoy !== null && ppiYoy > 3.0) {
+    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>PPI at ${ppiYoy.toFixed(1)}% YoY — pipeline pressure building.</strong> Producer prices lead consumer inflation by 3–6 months. Accelerating trend warrants close monitoring.` });
+  }
+
+  if (mich !== null && mich > 3.5) {
+    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Consumer inflation expectations: ${mich.toFixed(1)}%.</strong> Above 3.5% suggests expectations de-anchoring from Fed's 2% target — a self-fulfilling inflation risk.` });
+  }
+
+  if (fedRate !== null && coreCPI !== null) {
+    const real = fedRate - coreCPI;
+    if (real < 0) alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Negative real interest rate: ${real.toFixed(1)}%.</strong> Fed funds rate below inflation = monetary policy still accommodative despite tightening cycle.` });
+    else alerts.push({ type:'good', icon:'🟢', msg:`<strong>Real interest rate positive: +${real.toFixed(1)}%.</strong> Fed policy is genuinely restrictive — this is the primary anti-stagflation buffer.` });
+  }
+
+  if (unrate !== null && unrate < 5.0) {
+    alerts.push({ type:'good', icon:'🟢', msg:`<strong>Unemployment ${unrate.toFixed(1)}% — labor market still resilient.</strong> Stagflation historically requires high unemployment. Current labor strength is a key moderating factor.` });
+  }
+
+  // Default if no data
+  if (alerts.length === 0) {
+    alerts.push({ type:'watch', icon:'⏳', msg:'<strong>Insufficient data to generate dynamic alerts.</strong> Check FRED API connection.' });
+  }
+
+  return alerts;
+}
+
+// ════════════════════════════════════════════
+// HISTORICAL 1970s REFERENCE DATA (annual averages)
+// Used as dashed reference lines on sparklines
+// ════════════════════════════════════════════
+const HIST_1970s = {
+  'CPILFESL':       8.5,   // Core CPI avg 1973-80
+  'A191RL1Q225SBEA': 1.2,  // Real GDP avg 1973-80
+  'UNRATE':          6.8,  // Unemployment avg 1973-80
+  'PPIFID':         11.0,  // PPI avg 1973-80 (approx)
+  'FEDFUNDS':        8.0,  // Fed funds avg 1973-80
+  'MICH':            7.5,  // UMich inflation exp avg
+  'M2SL':           10.5,  // M2 growth avg 1973-80
+  'PCEPI':           7.8,  // PCE inflation avg
+  'DPCERE1Q156NBEA': 7.2,  // Core PCE avg
+};
+
+// ════════════════════════════════════════════
+// TREND DETECTION — 3-month direction
+// ════════════════════════════════════════════
 function calcTrend(series, n = 4) {
+  // Compare average of last n vs previous n periods
   if (!series || series.length < n * 2) return null;
   const recent = series.slice(-n).map(d => d.value);
   const prior  = series.slice(-n * 2, -n).map(d => d.value);
-  const avgRecent = recent.reduce((a,b) => a+b, 0) / recent.length;
-  const avgPrior  = prior.reduce((a,b)  => a+b, 0) / prior.length;
-  if (avgPrior === 0) return null;
+  const avgRecent = recent.reduce((a,b) => a+b,0) / recent.length;
+  const avgPrior  = prior.reduce((a,b) => a+b,0) / prior.length;
   const pct = ((avgRecent - avgPrior) / Math.abs(avgPrior)) * 100;
   if (Math.abs(pct) < 0.5) return { dir:'flat', pct };
   return { dir: pct > 0 ? 'up' : 'down', pct };
@@ -727,77 +680,53 @@ function trendHTML(trend, higherIsBad) {
     return `<div class="trend-row"><span class="trend-arrow trend-flat">→</span><span class="trend-label trend-flat">FLAT (3-mo avg)</span></div>`;
   }
   const isWorsen = (dir === 'up' && higherIsBad) || (dir === 'down' && !higherIsBad);
-  const cls  = isWorsen ? (dir === 'up' ? 'trend-up-bad'   : 'trend-down-bad')
-                        : (dir === 'up' ? 'trend-up-good'  : 'trend-down-good');
+  const cls = isWorsen ? (dir === 'up' ? 'trend-up-bad' : 'trend-down-bad')
+                       : (dir === 'up' ? 'trend-up-good' : 'trend-down-good');
   const arrow = dir === 'up' ? '↑' : '↓';
   const word  = isWorsen ? 'WORSENING' : 'IMPROVING';
   return `<div class="trend-row"><span class="trend-arrow ${cls}">${arrow}</span><span class="trend-label ${cls}">${word} ${absPct}% (3-mo avg)</span></div>`;
 }
 
-// ════════════════════════════════════════════════════════════════
-// SPARKLINE RENDERER — FIX #3: always renders in correct units
-// For index series (isYoY=true): computes and plots YoY% series.
-// Falls back to raw values only if insufficient data for YoY.
-// ════════════════════════════════════════════════════════════════
-const HIST_1970s = {
-  'CPILFESL':           8.5,   // Core CPI YoY% avg 1973-80
-  'A191RL1Q225SBEA':    1.2,   // Real GDP annualized % avg 1973-80
-  'UNRATE':             6.8,   // Unemployment avg 1973-80
-  'PPIFID':            11.0,   // PPI YoY% avg 1973-80
-  'PPIACO':            11.0,   // same reference
-  'FEDFUNDS':           8.0,   // Fed Funds avg 1973-80
-  'MICH':               7.5,   // UMich expectations avg
-  'M2SL':              10.5,   // M2 YoY% avg 1973-80
-  'PCEPI':              7.8,   // PCE inflation avg
-  'DPCERE1Q156NBEA':    7.2,   // Core PCE avg
-};
+// ════════════════════════════════════════════
+// RENDER SPARK with 1970s reference
+// ════════════════════════════════════════════
+function renderSpark(data, color, fredId, isYoY) {
+  if (!data || data.length < 2) return '<div class="spark-wrap"></div>';
 
-function renderSpark(rawSeries, color, fredId, isYoY, freq) {
-  if (!rawSeries || rawSeries.length < 2) return '<div class="spark-wrap"></div>';
-
-  let plotData;
-  let unitLabel;
-
-  if (isYoY) {
-    // FIX: use frequency-aware YoY computation for the sparkline
-    const yoySeries = computeYoySeries(rawSeries, freq || 'M');
-    if (yoySeries) {
-      plotData  = yoySeries.map(d => d.value);
-      unitLabel = '% YoY';
-    } else {
-      // Insufficient data for YoY — show raw with note
-      plotData  = rawSeries.map(d => d.value);
-      unitLabel = 'index (insuf. data for YoY)';
-    }
+  // For index series where we're showing YoY%, the raw spark data is still
+  // index values — we convert to YoY% for the sparkline display
+  let plotData = data;
+  if (isYoY && data.length >= 13) {
+    plotData = data.slice(12).map((v, i) => {
+      const prev = data[i].value;
+      return ((v.value - prev) / Math.abs(prev)) * 100;
+    });
   } else {
-    plotData  = rawSeries.map(d => d.value);
-    unitLabel = null;
+    plotData = data.map(d => typeof d === 'object' ? d.value : d);
   }
 
   const hist1970 = HIST_1970s[fredId] || null;
-  const allVals  = hist1970 ? [...plotData, hist1970] : plotData;
-  const mn  = Math.min(...allVals);
-  const mx  = Math.max(...allVals);
-  const rng = mx - mn || 1;
+  const allVals = hist1970 ? [...plotData, hist1970] : plotData;
+  const mn = Math.min(...allVals), mx = Math.max(...allVals), rng = mx - mn || 1;
   const W = 200, H = 44;
 
-  const pts = plotData.map((v, i) => {
-    const x = (i / (plotData.length - 1)) * W;
-    const y = H - ((v - mn) / rng) * H;
-    return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
+  const pts = plotData.map((v,i) => {
+    const x = (i/(plotData.length-1))*W;
+    const y = H - ((v - mn)/rng)*H;
+    return `${i===0?'M':'L'}${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(' ');
 
-  const lastY = H - ((plotData[plotData.length - 1] - mn) / rng) * H;
+  const lastY = H - ((plotData[plotData.length-1] - mn)/rng)*H;
 
-  let refLine = '', legend = '';
+  // 1970s reference line
+  let refLine = '';
+  let legend = '';
   if (hist1970 !== null) {
-    const refY = (H - ((hist1970 - mn) / rng) * H).toFixed(1);
-    const labelY = Math.max(8, parseFloat(refY) - 3);
-    refLine = `
-      <line x1="0" y1="${refY}" x2="${W}" y2="${refY}" stroke="#e8a02055" stroke-width="1" stroke-dasharray="3,3"/>
-      <text x="2" y="${labelY}" fill="#e8a02088" font-size="7" font-family="monospace">70s avg</text>`;
+    const refY = (H - ((hist1970 - mn)/rng)*H).toFixed(1);
+    refLine = `<line x1="0" y1="${refY}" x2="${W}" y2="${refY}" stroke="#e8a02055" stroke-width="1" stroke-dasharray="3,3"/>
+               <text x="2" y="${Math.max(8, parseFloat(refY)-3)}" fill="#e8a02088" font-size="7" font-family="monospace">70s avg</text>`;
     legend = `<div class="spark-legend">
-      <span><span class="leg-dot" style="background:${color}"></span>Now${unitLabel ? ' ('+unitLabel+')' : ''}</span>
+      <span><span class="leg-dot" style="background:${color}"></span>Now</span>
       <span><span class="leg-dot" style="background:#e8a020;opacity:.6"></span>1970s avg</span>
     </div>`;
   }
@@ -813,64 +742,13 @@ function renderSpark(rawSeries, color, fredId, isYoY, freq) {
   </div>`;
 }
 
-// ════════════════════════════════════════════════════════════════
-// DYNAMIC ALERTS
-// ════════════════════════════════════════════════════════════════
-function buildAlerts(d) {
-  const alerts = [];
-  const { coreCPI, gdpGrowth, unrate, ppiYoy, fedRate, mich } = d;
-
-  if (coreCPI !== null) {
-    if (coreCPI > 3.5)
-      alerts.push({ type:'crit', icon:'🔴', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — well above Fed's 2% target.</strong> Persistent inflation above 3.5% significantly elevates stagflation risk.` });
-    else if (coreCPI > 2.5)
-      alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — moderately above target.</strong> Still elevated but trending toward target. Watch for reversal from oil shock pass-through.` });
-    else
-      alerts.push({ type:'good', icon:'🟢', msg:`<strong>Core CPI at ${coreCPI.toFixed(1)}% — near multi-year lows.</strong> Key stagflation ingredient (entrenched inflation) currently absent.` });
-  }
-
-  if (gdpGrowth !== null) {
-    if (gdpGrowth < 0)
-      alerts.push({ type:'crit', icon:'🔴', msg:`<strong>GDP contraction: ${gdpGrowth.toFixed(1)}% annualized avg.</strong> Simultaneous contraction + elevated inflation = textbook stagflation condition.` });
-    else if (gdpGrowth < 1.5)
-      alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Near-stall GDP growth: ${gdpGrowth.toFixed(1)}% (4Q avg).</strong> Insufficient growth to absorb cost-push inflation. Stagflation conditions building.` });
-    else
-      alerts.push({ type:'good', icon:'🟢', msg:`<strong>GDP growth ${gdpGrowth.toFixed(1)}% (4Q avg) — reasonable pace.</strong> Growth above stall speed reduces stagflation probability materially.` });
-  }
-
-  if (ppiYoy !== null && ppiYoy > 3.0)
-    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>PPI at ${ppiYoy.toFixed(1)}% YoY — pipeline pressure building.</strong> Producer prices lead consumer inflation by 3–6 months. Accelerating trend warrants monitoring.` });
-
-  if (mich !== null && mich > 3.5)
-    alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Consumer inflation expectations: ${mich.toFixed(1)}%.</strong> Above 3.5% suggests expectations de-anchoring from Fed's 2% target — a self-fulfilling inflation risk.` });
-
-  if (fedRate !== null && coreCPI !== null) {
-    const real = fedRate - coreCPI;
-    if (real < 0)
-      alerts.push({ type:'warn', icon:'🟡', msg:`<strong>Negative real interest rate: ${real.toFixed(1)}%.</strong> Fed funds rate below inflation = monetary policy still accommodative despite tightening cycle.` });
-    else
-      alerts.push({ type:'good', icon:'🟢', msg:`<strong>Real interest rate positive: +${real.toFixed(1)}%.</strong> Fed policy is genuinely restrictive — primary anti-stagflation buffer currently active.` });
-  }
-
-  if (unrate !== null && unrate < 5.0)
-    alerts.push({ type:'good', icon:'🟢', msg:`<strong>Unemployment ${unrate.toFixed(1)}% — labor market still resilient.</strong> Stagflation historically requires high unemployment. Current labor strength is a key moderating factor.` });
-
-  if (alerts.length === 0)
-    alerts.push({ type:'watch', icon:'⏳', msg:'<strong>Insufficient data to generate dynamic alerts.</strong> Check FRED API connection.' });
-
-  return alerts;
-}
-
-// ════════════════════════════════════════════════════════════════
-// RENDER HELPERS
-// ════════════════════════════════════════════════════════════════
 function renderIndicators(indicators) {
   const grid = document.getElementById('ind-grid');
   grid.innerHTML = '';
   indicators.forEach(ind => {
-    const st   = statusFromScore(ind.score);
+    const st = statusFromScore(ind.score);
     const trend = trendHTML(ind.trend, ind.higherIsBad);
-    const div  = document.createElement('div');
+    const div = document.createElement('div');
     div.className = 'ind-card fade-in';
     div.innerHTML = `
       <div class="ind-top">
@@ -891,18 +769,17 @@ function renderIndicators(indicators) {
         <div class="bar-bg"><div class="bar-fill" style="width:0%;background:${st.color}" data-t="${ind.score}"></div></div>
         <div class="bar-score">Risk score: <strong>${ind.score}/100</strong></div>
       </div>
-      ${renderSpark(ind.rawSeries, st.color, ind.fredId, ind.isYoY, ind.freq)}
+      ${renderSpark(ind.rawSeries, st.color, ind.fredId, ind.isYoY)}
       <div class="ind-desc">${ind.desc}</div>
     `;
     grid.appendChild(div);
   });
-  setTimeout(() => {
-    document.querySelectorAll('.bar-fill[data-t]').forEach(b => b.style.width = b.dataset.t + '%');
-  }, 100);
+  setTimeout(() => { document.querySelectorAll('.bar-fill[data-t]').forEach(b => b.style.width = b.dataset.t + '%'); }, 100);
 }
 
 function renderAlerts(alerts) {
-  document.getElementById('alerts-container').innerHTML = alerts.map(a => `
+  const c = document.getElementById('alerts-container');
+  c.innerHTML = alerts.map(a => `
     <div class="alert-item ${a.type}">
       <div class="alert-icon">${a.icon}</div>
       <div class="alert-text">${a.msg}</div>
@@ -919,61 +796,81 @@ function renderComposite(score, scores) {
   labelEl.style.color = rl.color;
   setTimeout(() => { document.getElementById('main-bar').style.width = score + '%'; }, 200);
 
+  // Quads
+  const qInf = scores.coreCPI || 50;
+  const qGdp = scores.gdp || 50;
+  const qLab = scores.unrate || 50;
+  const qPpi = scores.ppi || 50;
+
   const qMap = (s) => {
     if (s >= 70) return { label:'CRITICAL', color:'#d94040' };
     if (s >= 50) return { label:'ELEVATED', color:'#e8a020' };
     if (s >= 30) return { label:'MODERATE', color:'#9a6a10' };
-    return          { label:'LOW',      color:'#27ae60' };
+    return { label:'LOW', color:'#27ae60' };
   };
-  [['q-inf', scores.coreCPI || 50], ['q-gdp', scores.gdp || 50],
-   ['q-lab', scores.unrate  || 50], ['q-ppi', scores.ppi || 50]].forEach(([id, s]) => {
+  [['q-inf',qInf],['q-gdp',qGdp],['q-lab',qLab],['q-ppi',qPpi]].forEach(([id,s]) => {
     const q = qMap(s), el = document.getElementById(id);
     el.textContent = q.label; el.style.color = q.color;
   });
 }
 
-// ════════════════════════════════════════════════════════════════
-// SCENARIOS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// SCENARIO BREAKDOWN — 3 named outcomes
+// ════════════════════════════════════════════
 function buildScenarios(composite, data) {
-  const { coreCPI, gdp, mich } = data;
+  const { coreCPI, gdp, unrate, ppi, mich } = data;
 
-  let pFull = Math.round(composite * 0.25);
-  let pLite = Math.round(composite * 0.55);
-  let pSoft = 100 - pFull - pLite;
+  // Probability model: three scenarios must sum to 100
+  // Soft Landing: inflation returns to target, growth holds
+  // Stagflation Lite: growth weak + inflation sticky 2.5-4%
+  // Full Stagflation: growth negative + inflation >4% sustained
 
-  pFull = Math.max(3,  Math.min(45, pFull));
+  const cpiHigh  = coreCPI !== null && coreCPI > 3.5;
+  const cpiMod   = coreCPI !== null && coreCPI > 2.5;
+  const gdpWeak  = gdp !== null && gdp < 1.5;
+  const michHigh = mich !== null && mich > 4.0;
+
+  // Base from composite score
+  let pFull = Math.round(composite * 0.25);           // Full stagflation
+  let pLite = Math.round(composite * 0.55);           // Stagflation lite
+  let pSoft = 100 - pFull - pLite;                    // Soft landing
+
+  // Clamp and rebalance
+  pFull = Math.max(3, Math.min(45, pFull));
   pLite = Math.max(15, Math.min(65, pLite));
-  pSoft = Math.max(5,  100 - pFull - pLite);
+  pSoft = Math.max(5, 100 - pFull - pLite);
+  // Renormalize to exactly 100
   const total = pFull + pLite + pSoft;
   pSoft = pSoft + (100 - total);
 
-  const michHigh = mich !== null && mich > 4.0;
-
   return [
     {
-      name:'Soft Landing', color:'#27ae60', prob: pSoft,
-      conditions:'Oil shock proves transitory, core CPI drifts back toward 2.5%, GDP rebounds above 2%, Fed delivers 1–2 cuts H2 2026.',
-      requires:[
-        coreCPI !== null ? (coreCPI <= 2.5 ? '✓ Core CPI already near target' : `✗ Core CPI needs to fall from ${coreCPI.toFixed(1)}% to ≤2.5%`) : '? Core CPI pending',
-        gdp     !== null ? (gdp >= 2.0 ? '✓ GDP growth adequate'           : `✗ GDP needs to recover from ${gdp.toFixed(1)}% avg`) : '? GDP pending',
-        mich    !== null ? (mich <= 3.5 ? '✓ Expectations reasonably anchored' : `✗ Expectations elevated at ${mich.toFixed(1)}%`) : '? Expectations pending',
+      name: 'Soft Landing',
+      color: '#27ae60',
+      prob: pSoft,
+      conditions: 'Oil shock proves transitory, core CPI drifts back toward 2.5%, GDP rebounds above 2%, Fed delivers 1–2 cuts H2 2026.',
+      requires: [
+        coreCPI !== null ? (coreCPI <= 2.5 ? '✓ Core CPI already near target' : `✗ Core CPI needs to fall from ${coreCPI.toFixed(1)}% to ≤2.5%`) : '? Core CPI data pending',
+        gdp !== null ? (gdp >= 2.0 ? '✓ GDP growth adequate' : `✗ GDP needs to recover from ${gdp.toFixed(1)}% avg`) : '? GDP data pending',
+        mich !== null ? (mich <= 3.5 ? '✓ Expectations reasonably anchored' : `✗ Expectations elevated at ${mich.toFixed(1)}%`) : '? Expectations data pending',
       ],
-      actions:[
+      actions: [
         'No defensive repositioning needed — maintain diversified allocation',
         'Gradual shift back to longer-duration bonds as rate cuts approach',
         'Growth stocks and cyclicals benefit most from this outcome',
       ]
     },
     {
-      name:'Stagflation Lite', color:'#e8a020', prob: pLite,
-      conditions:'Inflation sticky at 2.5–4%, GDP growth muddling at 1–2%, Fed on hold all year, oil shock partially absorbed.',
-      requires:[
+      name: 'Stagflation Lite',
+      color: '#e8a020',
+      prob: pLite,
+      conditions: 'Inflation sticky at 2.5–4%, GDP growth muddling at 1–2%, Fed on hold all year, oil shock partially absorbed.',
+      requires: [
         'Inflation above 2% but below full-crisis levels (2.5–4% range)',
         'Growth positive but below trend — not a recession, not booming',
-        "Fed trapped: can't cut (inflation) or hike (growth risk)",
+        'Fed trapped: can\'t cut (inflation) or hike (growth risk)',
       ],
-      actions:[
+      actions: [
         'TIPS and short-duration bonds outperform long-duration',
         'Value equities over growth; energy and healthcare resilient',
         'Real assets (commodities, REITs) provide partial inflation hedge',
@@ -981,14 +878,16 @@ function buildScenarios(composite, data) {
       ]
     },
     {
-      name:'Full Stagflation', color:'#d94040', prob: pFull,
-      conditions:'Oil shock sustained, inflation rises above 4%, GDP contracts, unemployment climbs above 5.5%, Fed forced to choose between mandates.',
-      requires:[
+      name: 'Full Stagflation',
+      color: '#d94040',
+      prob: pFull,
+      conditions: 'Oil shock sustained, inflation rises above 4%, GDP contracts, unemployment climbs above 5.5%, Fed forced to choose between mandates.',
+      requires: [
         'Strait of Hormuz blockade persists through Q3 2026',
-        coreCPI !== null && coreCPI > 3.5 ? `⚠ Core CPI already elevated at ${coreCPI.toFixed(1)}%` : 'Core CPI would need to rise above 4%',
+        cpiHigh ? `⚠ Core CPI already elevated at ${coreCPI?.toFixed(1)}%` : 'Core CPI would need to rise above 4%',
         michHigh ? '⚠ Expectations already de-anchoring' : 'Inflation expectations would need to de-anchor above 4%',
       ],
-      actions:[
+      actions: [
         'Defensive positioning: energy, healthcare, materials equities',
         'Gold and commodities as monetary hedge',
         'Avoid long-duration bonds — inflation erodes real value rapidly',
@@ -1001,7 +900,9 @@ function buildScenarios(composite, data) {
 
 function renderScenarios(composite, data) {
   const scenarios = buildScenarios(composite, data);
-  const section   = document.getElementById('scenario-section');
+  const section = document.getElementById('scenario-section');
+
+  const totalCheck = scenarios.reduce((a,s) => a+s.prob, 0);
 
   section.innerHTML = `
     <div class="scenario-intro">
@@ -1013,7 +914,8 @@ function renderScenarios(composite, data) {
         <div class="sc-sum-item">
           <div class="sc-sum-label">${s.name.toUpperCase()}</div>
           <div class="sc-sum-val" style="color:${s.color}">${s.prob}%</div>
-        </div>`).join('')}
+        </div>
+      `).join('')}
     </div>
     <div class="scenario-grid">
       ${scenarios.map(s => `
@@ -1026,7 +928,9 @@ function renderScenarios(composite, data) {
           <div class="sc-bar-bg">
             <div class="sc-bar-fill" style="width:0%;background:${s.color}" data-t="${s.prob}"></div>
           </div>
-          <div class="sc-conditions"><strong>CONDITIONS</strong>${s.conditions}</div>
+          <div class="sc-conditions">
+            <strong>CONDITIONS</strong>${s.conditions}
+          </div>
           <div class="sc-conditions">
             <strong>KEY REQUIREMENTS</strong>
             ${s.requires.map(r => `<div style="margin-bottom:3px;font-size:11px">${r}</div>`).join('')}
@@ -1035,9 +939,10 @@ function renderScenarios(composite, data) {
             <strong>ACTIONS IF THIS SCENARIO PLAYS OUT</strong>
           </div>
           <ul class="sc-actions">
-            ${s.actions.map(a => `<li>${a}</li>`).join('')}
+            ${s.actions.map(a => `<li style="color:var(--text)">${a}</li>`).join('')}
           </ul>
-        </div>`).join('')}
+        </div>
+      `).join('')}
     </div>
   `;
 
@@ -1046,9 +951,9 @@ function renderScenarios(composite, data) {
   }, 150);
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // METHODOLOGY
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 const methodology = [
   { rank:'01', name:'Core CPI',         weight:22, desc:'Primary Fed mandate metric. Persistent deviation above 2% is the central stagflation indicator.' },
   { rank:'02', name:'Real GDP Growth',   weight:20, desc:'The "stagnation" component. Near-zero or negative growth concurrent with inflation = stagflation definition.' },
@@ -1056,7 +961,7 @@ const methodology = [
   { rank:'04', name:'Unemployment',     weight:13, desc:'Phillips curve breakdown. Stagflation requires rising unemployment alongside rising prices.' },
   { rank:'05', name:'Fed Funds Rate',   weight:10, desc:'Real interest rate vs. inflation. Negative real rates = still inflationary despite nominal tightening.' },
   { rank:'06', name:'PCE Inflation',    weight:8,  desc:"Fed's own preferred measure. Gap between PCE and 2% directly constrains rate cut flexibility." },
-  { rank:'07', name:'Inflation Expec.', weight:7,  desc:"Self-fulfilling cycle driver. 5-year expectation de-anchoring is Powell's stated key risk trigger." },
+  { rank:'07', name:'Inflation Expec.', weight:7,  desc:'Self-fulfilling cycle driver. 5-year expectation de-anchoring is Powell\'s stated key risk trigger.' },
   { rank:'08', name:'M2 Money Supply',  weight:6,  desc:'Monetary inflation pressure. M2 growth well above nominal GDP growth adds inflationary impulse.' }
 ];
 
@@ -1069,7 +974,7 @@ function renderMethodology() {
     div.innerHTML = `
       <div class="meth-rank">FACTOR ${m.rank}</div>
       <div class="meth-name">${m.name}</div>
-      <div class="meth-bar-bg"><div class="meth-bar-fill" style="width:${m.weight * 4}%"></div></div>
+      <div class="meth-bar-bg"><div class="meth-bar-fill" style="width:${m.weight*4}%"></div></div>
       <div class="meth-pct">${m.weight}% weight</div>
       <div class="meth-desc">${m.desc}</div>
     `;
@@ -1077,9 +982,9 @@ function renderMethodology() {
   });
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // LOADING HELPERS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 function setLoadStatus(msg, pct) {
   document.getElementById('load-status').textContent = msg;
   document.getElementById('load-bar').style.width = pct + '%';
@@ -1091,14 +996,15 @@ function hideLoader() {
 }
 
 function showError(msg) {
-  document.getElementById('error-banner').classList.add('show');
+  const b = document.getElementById('error-banner');
+  b.classList.add('show');
   hideLoader();
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
 // MAIN INIT
-// ════════════════════════════════════════════════════════════════
-async function init(isRefresh = false) {
+// ════════════════════════════════════════════
+async function init() {
   const apiKey = getApiKey();
 
   if (!apiKey) {
@@ -1112,28 +1018,32 @@ async function init(isRefresh = false) {
     const raw = await fetchAllData(apiKey);
     setLoadStatus('COMPUTING RISK SCORES...', 92);
 
-    // ── FIX #1: Frequency-aware YoY for all index-level series ──────
-    // Monthly series (lookback = 12): CORE_CPI, PPI, M2, PCE
-    // Quarterly series (lookback = 4): CORE_PCE
-    const coreCPIYoy  = yoyChange(raw.CORE_CPI,  'M');   // CPILFESL monthly index → YoY%
-    const ppiYoy      = yoyChange(raw.PPI,        'M');   // PPIFID/PPIACO monthly index → YoY%
-    const m2Yoy       = yoyChange(raw.M2,         'M');   // M2SL monthly index → YoY%
-    const pceYoy      = yoyChange(raw.PCE,        'M');   // PCEPI monthly index → YoY%
-    const corePceYoy  = yoyChange(raw.CORE_PCE,   'Q');   // DPCERE1Q156NBEA quarterly → YoY% (FIX: was using 13 obs, needs 4)
+    // ── Extract values ──────────────────────────────────────────────────
+    // FRED index-level series (CPILFESL, PCEPI, PPIFID, M2SL) need YoY%
+    // computed from the index, not used as raw numbers.
+    // Rate/% series (UNRATE, FEDFUNDS, MICH, GDP) are already percentages.
 
-    // GDP: 4-quarter average to avoid single-quarter distortion
-    const gdpRaw = (raw.GDP || []).slice(-4).map(d => d.value).filter(v => !isNaN(v));
+    const coreCPIYoy  = yoyChange(raw.CORE_CPI);   // CPILFESL index → YoY%
+    const ppiYoy      = yoyChange(raw.PPI);          // PPIFID index → YoY%
+    const m2Yoy       = yoyChange(raw.M2);           // M2SL index → YoY%
+    const pceYoy      = yoyChange(raw.PCE);          // PCEPI index → YoY%
+    const corePceYoy  = yoyChange(raw.CORE_PCE);     // DPCERE1Q156NBEA → YoY%
+
+    // GDP: average last 4 quarters to avoid single-quarter distortion
+    // One weak quarter (e.g. Q4 2025 at 0.7%) ≠ sustained stagnation
+    const gdpRaw = raw.GDP.slice(-4).map(d => d.value).filter(v => !isNaN(v));
     const gdpVal = gdpRaw.length > 0
       ? gdpRaw.reduce((a, b) => a + b, 0) / gdpRaw.length
       : null;
+    const unrateVal   = latestVal(raw.UNRATE);        // already %
+    const fedRateVal  = latestVal(raw.FED_RATE);      // already %
+    const michVal     = latestVal(raw.MICH);          // already % expectation
 
-    const unrateVal  = latestVal(raw.UNRATE);
-    const fedRateVal = latestVal(raw.FED_RATE);
-    const michVal    = latestVal(raw.MICH);
+    // For Fed real rate: nominal fed rate minus core CPI YoY
     const realFedRate = (fedRateVal !== null && coreCPIYoy !== null)
       ? fedRateVal - coreCPIYoy : null;
 
-    // Score computation
+    // Compute scores — all inputs now in consistent % terms
     const scores = {
       coreCPI: scoreCoreCPI(coreCPIYoy),
       gdp:     scoreGDP(gdpVal),
@@ -1147,114 +1057,157 @@ async function init(isRefresh = false) {
 
     const composite = computeComposite(scores);
 
-    // Debug console table
-    console.table({
-      '-- SERIES DATA --':   '',
-      'Core CPI YoY %':      coreCPIYoy?.toFixed(2)   ?? 'N/A',
-      'Core PCE YoY % (Q)':  corePceYoy?.toFixed(2)   ?? 'N/A (FIX: quarterly lookback=4)',
-      'GDP 4Q Avg %':        gdpVal?.toFixed(2)        ?? 'N/A',
-      'Unemployment %':      unrateVal?.toFixed(1)     ?? 'N/A',
-      'PPI YoY %':           ppiYoy?.toFixed(2)        ?? 'N/A',
-      'Fed Rate %':          fedRateVal?.toFixed(2)    ?? 'N/A',
-      'Real Fed Rate %':     realFedRate?.toFixed(2)   ?? 'N/A',
-      'Michigan Exp %':      michVal?.toFixed(1)       ?? 'N/A',
-      'M2 YoY %':            m2Yoy?.toFixed(2)         ?? 'N/A',
-      '-- SCORES --':        '',
-      'Score coreCPI':       scores.coreCPI,
-      'Score GDP':           scores.gdp,
-      'Score Unrate':        scores.unrate,
-      'Score PPI':           scores.ppi,
-      'Score FedRate':       scores.fedRate,
-      'Score PCE':           scores.pce,
-      'Score Mich':          scores.mich,
-      'Score M2':            scores.m2,
-      'COMPOSITE':           composite,
-    });
-
-    // Deltas
-    const coreCPIPrevYoy = yoyChange((raw.CORE_CPI || []).slice(0, -1), 'M');
-    const prevUn         = (raw.UNRATE || []).length > 1 ? raw.UNRATE[raw.UNRATE.length - 2]?.value : null;
-    const ppiPrevYoy     = yoyChange((raw.PPI || []).slice(0, -1), 'M');
-
+    // Format helpers
+    const fmt = (v, dec=1) => v !== null ? v.toFixed(dec) : '--';
     const fmtDelta = (v, prev) => {
       if (v === null || prev === null) return { text:'N/A', cls:'d-none' };
       const d = v - prev;
       const sign = d > 0 ? '+' : '';
-      const cls  = d > 0.1 ? 'd-bad' : d < -0.1 ? 'd-good' : 'd-warn';
+      const cls = d > 0.1 ? 'd-bad' : d < -0.1 ? 'd-good' : 'd-warn';
       return { text:`${sign}${d.toFixed(1)} vs prev`, cls };
     };
-    const fmt = (v, dec = 1) => v !== null ? v.toFixed(dec) : '--';
 
-    // Build indicator cards
+    // For delta display: compute prev-period YoY by dropping last observation
+    const coreCPIPrevYoy = yoyChange(raw.CORE_CPI.slice(0, -1));
+    const prevUn         = raw.UNRATE.length > 1 ? raw.UNRATE[raw.UNRATE.length-2]?.value : null;
+    const ppiPrevYoy     = yoyChange(raw.PPI.slice(0, -1));
+
+    // Debug: log all computed values to browser console for verification
+    console.table({
+      'Core CPI YoY %': coreCPIYoy?.toFixed(2),
+      'GDP 4Q Avg %':   gdpVal?.toFixed(2),
+      'Unemployment %': unrateVal?.toFixed(1),
+      'PPI YoY %':      ppiYoy?.toFixed(2),
+      'Fed Rate %':     fedRateVal?.toFixed(2),
+      'Real Fed Rate %':realFedRate?.toFixed(2),
+      'Michigan Exp %': michVal?.toFixed(1),
+      'M2 YoY %':       m2Yoy?.toFixed(2),
+      'Core PCE YoY %': (corePceYoy ?? pceYoy)?.toFixed(2),
+      '--- SCORES ---':  '',
+      'Score coreCPI':  scores.coreCPI,
+      'Score GDP':      scores.gdp,
+      'Score Unrate':   scores.unrate,
+      'Score PPI':      scores.ppi,
+      'Score FedRate':  scores.fedRate,
+      'Score PCE':      scores.pce,
+      'Score Mich':     scores.mich,
+      'Score M2':       scores.m2,
+      'COMPOSITE':      computeComposite(scores),
+    });
+
+    // Build indicator cards — now with rawSeries for sparklines + trend detection
     const indicators = [
       {
         name:'Core CPI (ex-Food/Energy)', weight:22, score:scores.coreCPI, fredId:'CPILFESL',
         displayVal: fmt(coreCPIYoy), unit:'% YoY',
         delta: fmtDelta(coreCPIYoy, coreCPIPrevYoy).text,
         deltaClass: fmtDelta(coreCPIYoy, coreCPIPrevYoy).cls,
-        period: (raw.CORE_CPI||[]).length ? raw.CORE_CPI[raw.CORE_CPI.length-1].date : 'N/A',
-        rawSeries: raw.CORE_CPI, isYoY: true, freq:'M', higherIsBad: true,
+        period: raw.CORE_CPI.length ? raw.CORE_CPI[raw.CORE_CPI.length-1].date : 'N/A',
+        rawSeries: raw.CORE_CPI, isYoY: true, higherIsBad: true,
         trend: calcTrend(raw.CORE_CPI),
-        desc:`Core CPI YoY % (excludes food & energy). Fed's 2% target. Current: ${fmt(coreCPIYoy)}%. Dashed = 1970s stagflation avg (~8.5%).`
+        desc: `Core CPI YoY % (excludes food & energy). Fed's 2% target is the benchmark. Current: ${fmt(coreCPIYoy)}%. Dashed line = 1970s stagflation avg (~8.5%).`
       },
       {
         name:'Real GDP Growth', weight:20, score:scores.gdp, fredId:'A191RL1Q225SBEA',
         displayVal: fmt(gdpVal), unit:'% 4Q avg',
         delta: gdpVal !== null ? (gdpVal < 1.5 ? '⚠ Near stall' : '✓ Adequate') : 'N/A',
         deltaClass: gdpVal !== null ? (gdpVal < 1.5 ? 'd-bad' : 'd-good') : 'd-none',
-        period: (raw.GDP||[]).length ? raw.GDP[raw.GDP.length-1].date : 'N/A',
-        rawSeries: raw.GDP, isYoY: false, freq:'Q', higherIsBad: false,
+        period: raw.GDP.length ? raw.GDP[raw.GDP.length-1].date : 'N/A',
+        rawSeries: raw.GDP, isYoY: false, higherIsBad: false,
         trend: calcTrend(raw.GDP),
-        desc:`4-quarter average annualized real GDP growth %. Values below 1.5% signal stagnation risk. Dashed = 1970s avg (~1.2%).`
+        desc: `4-quarter average annualized real GDP growth. Sustained values below 1.5% signal stagnation. Dashed line = 1970s avg (~1.2%).`
       },
       {
         name:'Unemployment Rate', weight:13, score:scores.unrate, fredId:'UNRATE',
         displayVal: fmt(unrateVal), unit:'%',
-        delta: fmtDelta(unrateVal, prevUn).text,
-        deltaClass: fmtDelta(unrateVal, prevUn).cls,
-        period: (raw.UNRATE||[]).length ? raw.UNRATE[raw.UNRATE.length-1].date : 'N/A',
-        rawSeries: raw.UNRATE, isYoY: false, freq:'M', higherIsBad: true,
+        delta: fmtDelta(unrateVal, prevUn).text, deltaClass: fmtDelta(unrateVal, prevUn).cls,
+        period: raw.UNRATE.length ? raw.UNRATE[raw.UNRATE.length-1].date : 'N/A',
+        rawSeries: raw.UNRATE, isYoY: false, higherIsBad: true,
         trend: calcTrend(raw.UNRATE),
-        desc:`Unemployment rate %. Full stagflation requires >5.5% alongside high inflation. Dashed = 1970s avg (~6.8%).`
+        desc: `Unemployment rate. Full stagflation requires >5.5% alongside high inflation. Dashed line = 1970s avg (~6.8%).`
       },
       {
         name:'PPI — Producer Prices', weight:14, score:scores.ppi, fredId:'PPIFID',
         displayVal: fmt(ppiYoy), unit:'% YoY',
         delta: fmtDelta(ppiYoy, ppiPrevYoy).text,
         deltaClass: fmtDelta(ppiYoy, ppiPrevYoy).cls,
-        period: (raw.PPI||[]).length ? raw.PPI[raw.PPI.length-1].date : 'N/A',
-        rawSeries: raw.PPI, isYoY: true, freq:'M', higherIsBad: true,
+        period: raw.PPI.length ? raw.PPI[raw.PPI.length-1].date : 'N/A',
+        rawSeries: raw.PPI, isYoY: true, higherIsBad: true,
         trend: calcTrend(raw.PPI),
-        desc:`Producer Price Index YoY %. Leads CPI by 3–6 months — best forward signal. Dashed = 1970s avg (~11%). Falls back to PPIACO if PPIFID unavailable.`
+        desc: `Producer Price Index YoY %. Leads CPI by 3–6 months. Dashed line = 1970s avg (~11%).`
       },
       {
         name:'Fed Funds Rate', weight:10, score:scores.fedRate, fredId:'FEDFUNDS',
         displayVal: fmt(fedRateVal), unit:'%',
         delta: realFedRate !== null ? `Real: ${fmt(realFedRate)}%` : 'N/A',
         deltaClass: realFedRate !== null ? (realFedRate > 0 ? 'd-good' : 'd-bad') : 'd-none',
-        period: (raw.FED_RATE||[]).length ? raw.FED_RATE[raw.FED_RATE.length-1].date : 'N/A',
-        rawSeries: raw.FED_RATE, isYoY: false, freq:'M', higherIsBad: false,
+        period: raw.FED_RATE.length ? raw.FED_RATE[raw.FED_RATE.length-1].date : 'N/A',
+        rawSeries: raw.FED_RATE, isYoY: false, higherIsBad: false,
         trend: calcTrend(raw.FED_RATE),
-        desc:`Federal funds rate %. Real rate (nominal − core CPI YoY) = ${fmt(realFedRate)}%. 1970s avg ~8% but real rate was deeply negative.`
+        desc: `Federal funds rate. Real rate (nominal − core CPI YoY) = ${fmt(realFedRate)}%. 1970s avg ~8% but real rate was often deeply negative.`
       },
       {
         name:'PCE Inflation (Core)', weight:8, score:scores.pce, fredId:'DPCERE1Q156NBEA',
         displayVal: fmt(corePceYoy ?? pceYoy), unit:'% YoY',
         delta: (corePceYoy ?? pceYoy) !== null ? ((corePceYoy ?? pceYoy) > 2.5 ? '⚠ Above target' : '✓ Near target') : 'N/A',
         deltaClass: (corePceYoy ?? pceYoy) !== null ? ((corePceYoy ?? pceYoy) > 2.5 ? 'd-warn' : 'd-good') : 'd-none',
-        period: (raw.CORE_PCE||[]).length ? raw.CORE_PCE[raw.CORE_PCE.length-1].date : 'N/A',
-        rawSeries: (raw.CORE_PCE||[]).length ? raw.CORE_PCE : raw.PCE,
-        isYoY: true,
-        // FIX: Core PCE (DPCERE1Q156NBEA) is quarterly — use 'Q' for correct YoY
-        freq: (raw.CORE_PCE||[]).length ? 'Q' : 'M',
-        higherIsBad: true,
-        trend: calcTrend((raw.CORE_PCE||[]).length ? raw.CORE_PCE : raw.PCE),
-        desc:`Core PCE — Fed's preferred inflation measure (quarterly). Constrains rate cuts when above 2%. Current: ${fmt(corePceYoy ?? pceYoy)}%.`
+        period: raw.CORE_PCE.length ? raw.CORE_PCE[raw.CORE_PCE.length-1].date : 'N/A',
+        rawSeries: raw.CORE_PCE.length ? raw.CORE_PCE : raw.PCE, isYoY: true, higherIsBad: true,
+        trend: calcTrend(raw.CORE_PCE.length ? raw.CORE_PCE : raw.PCE),
+        desc: `Core PCE — Fed's preferred measure. Constrains rate-cut flexibility when above 2%. Current: ${fmt(corePceYoy ?? pceYoy)}%.`
       },
       {
         name:'Inflation Expectations (UMich)', weight:7, score:scores.mich, fredId:'MICH',
         displayVal: fmt(michVal), unit:'% 1-yr',
         delta: michVal !== null ? (michVal > 3.5 ? '⚠ De-anchoring' : '✓ Anchored') : 'N/A',
         deltaClass: michVal !== null ? (michVal > 3.5 ? 'd-bad' : 'd-good') : 'd-none',
-        period: (raw.MICH||[]).length ? raw.MICH[raw.MICH.length-1].date : 'N/A',
-        rawSeries: raw.MICH, isYoY: fal
+        period: raw.MICH.length ? raw.MICH[raw.MICH.length-1].date : 'N/A',
+        rawSeries: raw.MICH, isYoY: false, higherIsBad: true,
+        trend: calcTrend(raw.MICH),
+        desc: `University of Michigan 1-year inflation expectations. 1970s avg ~7.5%. De-anchoring above 4% is Powell's stated key risk trigger.`
+      },
+      {
+        name:'M2 Money Supply Growth', weight:6, score:scores.m2, fredId:'M2SL',
+        displayVal: fmt(m2Yoy), unit:'% YoY',
+        delta: m2Yoy !== null ? (m2Yoy > 5 ? '⚠ Fast growth' : '✓ Moderate') : 'N/A',
+        deltaClass: m2Yoy !== null ? (m2Yoy > 5 ? 'd-bad' : 'd-good') : 'd-none',
+        period: raw.M2.length ? raw.M2[raw.M2.length-1].date : 'N/A',
+        rawSeries: raw.M2, isYoY: true, higherIsBad: true,
+        trend: calcTrend(raw.M2),
+        desc: `M2 money supply YoY growth. 1970s avg ~10.5%. Post-pandemic surge has normalized. Current: ${fmt(m2Yoy)}%.`
+      }
+    ];
+
+    // RENDER EVERYTHING
+    setLoadStatus('RENDERING DASHBOARD...', 96);
+    renderComposite(composite, scores);
+    renderAlerts(buildAlerts({ coreCPI: coreCPIYoy, gdpGrowth: gdpVal, unrate: unrateVal, ppiYoy, fedRate: fedRateVal, mich: michVal }));
+    renderIndicators(indicators);
+    renderScenarios(composite, { coreCPI: coreCPIYoy, gdp: gdpVal, unrate: unrateVal, ppi: ppiYoy, mich: michVal });
+    renderMethodology();
+
+    // Footer / last updated
+    const now = new Date();
+    const ts = now.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) + ' ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('last-updated').textContent = 'Updated: ' + ts;
+    document.getElementById('footer-ts').textContent = 'LAST FETCH: ' + ts;
+
+    hideLoader();
+
+  } catch (err) {
+    console.error('FRED fetch error:', err);
+    if (err.message.includes('403') || err.message.includes('400') || err.message.includes('Invalid')) {
+      showError('Invalid API key. Please check and re-enter.');
+    } else if (err.message.includes('All proxies failed')) {
+      showError('All CORS proxies failed. Check your internet connection, or try again in a moment — free proxies occasionally go down briefly.');
+    } else {
+      showError('Network error. Check your internet connection and try refreshing.');
+    }
+    renderMethodology();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
