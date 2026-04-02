@@ -290,6 +290,7 @@
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
 <div class="loading-screen" id="loader">
   <div class="loading-title">LOADING LIVE DATA</div>
   <div class="loading-bar-bg"><div class="loading-bar-fill" id="load-bar"></div></div>
@@ -302,6 +303,7 @@
     <div class="logo-sub">US ECONOMY · FRED API · AUTO-UPDATING EVERY 12H</div>
   </div>
   <div class="header-right">
+    <!-- Auto-refresh countdown -->
     <div class="refresh-badge" title="Click to refresh now" onclick="triggerManualRefresh()">
       <span class="refresh-icon">⟳</span>
       <div id="countdown-wrap">NEXT REFRESH: <span id="countdown">12:00:00</span></div>
@@ -312,8 +314,10 @@
   </div>
 </header>
 
+<!-- SERIES HEALTH BANNER -->
 <div class="health-banner" id="health-banner"></div>
 
+<!-- API KEY ERROR / SETUP -->
 <div class="error-banner" id="error-banner">
   <strong style="color:var(--white)">⚠ FRED API KEY REQUIRED</strong><br>
   This dashboard fetches live data from the Federal Reserve Economic Data (FRED) API — it's free.<br>
@@ -326,6 +330,7 @@
 </div>
 
 <main>
+  <!-- HERO -->
   <div class="hero fade-in" id="hero-section">
     <div class="score-card">
       <div class="score-label">// Composite Stagflation Risk Index</div>
@@ -352,12 +357,15 @@
     </div>
   </div>
 
+  <!-- INDICATORS -->
   <div class="section-title">// Live Economic Indicators — FRED API</div>
   <div class="ind-grid" id="ind-grid"></div>
 
+  <!-- SCENARIO BREAKDOWN -->
   <div class="section-title">// Scenario Probability Breakdown — 3 Outcomes</div>
   <div class="scenario-section" id="scenario-section"></div>
 
+  <!-- METHODOLOGY -->
   <div class="section-title">// Indicator Weight Methodology</div>
   <div class="meth-grid" id="meth-grid"></div>
 
@@ -538,7 +546,7 @@ async function fetchAllData(apiKey) {
 }
 
 // ════════════════════════════════════════════════════════════════
-// FREQUENCY-AWARE YoY COMPUTATION
+// FIX #1 — FREQUENCY-AWARE YoY COMPUTATION
 // Monthly series: look back 12 observations for 1 year
 // Quarterly series: look back 4 observations for 1 year
 // ════════════════════════════════════════════════════════════════
@@ -557,7 +565,7 @@ function latestVal(series) {
 }
 
 // ════════════════════════════════════════════════════════════════
-// SPARKLINE YoY% — always show YoY% for index series,
+// FIX #3 — SPARKLINE YoY% — always show YoY% for index series,
 // regardless of observation count (graceful fallback to raw if insufficient)
 // ════════════════════════════════════════════════════════════════
 function computeYoySeries(series, freq = 'M') {
@@ -575,7 +583,7 @@ function computeYoySeries(series, freq = 'M') {
 }
 
 // ════════════════════════════════════════════════════════════════
-// SERIES HEALTH BANNER
+// FIX #2 — SERIES HEALTH BANNER
 // ════════════════════════════════════════════════════════════════
 function renderHealthBanner(results, failed) {
   const banner = document.getElementById('health-banner');
@@ -727,7 +735,9 @@ function trendHTML(trend, higherIsBad) {
 }
 
 // ════════════════════════════════════════════════════════════════
-// SPARKLINE RENDERER
+// SPARKLINE RENDERER — FIX #3: always renders in correct units
+// For index series (isYoY=true): computes and plots YoY% series.
+// Falls back to raw values only if insufficient data for YoY.
 // ════════════════════════════════════════════════════════════════
 const HIST_1970s = {
   'CPILFESL':           8.5,   // Core CPI YoY% avg 1973-80
@@ -749,7 +759,7 @@ function renderSpark(rawSeries, color, fredId, isYoY, freq) {
   let unitLabel;
 
   if (isYoY) {
-    // Frequency-aware YoY computation for the sparkline
+    // FIX: use frequency-aware YoY computation for the sparkline
     const yoySeries = computeYoySeries(rawSeries, freq || 'M');
     if (yoySeries) {
       plotData  = yoySeries.map(d => d.value);
@@ -923,7 +933,7 @@ function renderComposite(score, scores) {
 }
 
 // ════════════════════════════════════════════════════════════════
-// SCENARIOS WITH EXPANDED PLAYBOOK
+// SCENARIOS
 // ════════════════════════════════════════════════════════════════
 function buildScenarios(composite, data) {
   const { coreCPI, gdp, mich } = data;
@@ -943,47 +953,47 @@ function buildScenarios(composite, data) {
   return [
     {
       name:'Soft Landing', color:'#27ae60', prob: pSoft,
-      conditions:'Supply-chain normalizes, core CPI drifts back toward 2.5%, GDP rebounds above 2%, Fed delivers rate cuts.',
+      conditions:'Oil shock proves transitory, core CPI drifts back toward 2.5%, GDP rebounds above 2%, Fed delivers 1–2 cuts H2 2026.',
       requires:[
         coreCPI !== null ? (coreCPI <= 2.5 ? '✓ Core CPI already near target' : `✗ Core CPI needs to fall from ${coreCPI.toFixed(1)}% to ≤2.5%`) : '? Core CPI pending',
         gdp     !== null ? (gdp >= 2.0 ? '✓ GDP growth adequate'           : `✗ GDP needs to recover from ${gdp.toFixed(1)}% avg`) : '? GDP pending',
         mich    !== null ? (mich <= 3.5 ? '✓ Expectations reasonably anchored' : `✗ Expectations elevated at ${mich.toFixed(1)}%`) : '? Expectations pending',
       ],
       actions:[
-        'CORE EQUITIES: Maintain diversified allocation; growth stocks and cyclicals benefit most.',
-        'FIXED INCOME: Gradual shift back to longer-duration bonds as Fed rate cuts approach.',
-        'RISK-ON: Slowly increase exposure to small-caps and consumer discretionary.'
+        'No defensive repositioning needed — maintain diversified allocation',
+        'Gradual shift back to longer-duration bonds as rate cuts approach',
+        'Growth stocks and cyclicals benefit most from this outcome',
       ]
     },
     {
       name:'Stagflation Lite', color:'#e8a020', prob: pLite,
-      conditions:'Inflation sticky at 2.5–4%, GDP growth muddling at 1–2%, Fed on hold, cost-push pressures partially absorbed.',
+      conditions:'Inflation sticky at 2.5–4%, GDP growth muddling at 1–2%, Fed on hold all year, oil shock partially absorbed.',
       requires:[
         'Inflation above 2% but below full-crisis levels (2.5–4% range)',
         'Growth positive but below trend — not a recession, not booming',
         "Fed trapped: can't cut (inflation) or hike (growth risk)",
       ],
       actions:[
-        'TIPS & SHORT BONDS: Shift away from long-duration fixed income to reduce interest rate risk.',
-        'VALUE EQUITIES: Overweight value over growth; focus on energy, healthcare, and dividend-payers.',
-        'REAL ASSETS: Broad commodities and REITs provide partial inflation buffering.',
-        'DEBT MANAGEMENT: Lock in fixed rates on any variable-rate debt immediately.'
+        'TIPS and short-duration bonds outperform long-duration',
+        'Value equities over growth; energy and healthcare resilient',
+        'Real assets (commodities, REITs) provide partial inflation hedge',
+        'Lock in fixed rates on any variable-rate debt now',
       ]
     },
     {
       name:'Full Stagflation', color:'#d94040', prob: pFull,
-      conditions:'Supply-side shock sustained, inflation rises above 4%, GDP contracts, unemployment climbs above 5.5%, Fed forced to choose between mandates.',
+      conditions:'Oil shock sustained, inflation rises above 4%, GDP contracts, unemployment climbs above 5.5%, Fed forced to choose between mandates.',
       requires:[
-        'Supply-side shocks persist through the current economic cycle',
+        'Strait of Hormuz blockade persists through Q3 2026',
         coreCPI !== null && coreCPI > 3.5 ? `⚠ Core CPI already elevated at ${coreCPI.toFixed(1)}%` : 'Core CPI would need to rise above 4%',
         michHigh ? '⚠ Expectations already de-anchoring' : 'Inflation expectations would need to de-anchor above 4%',
       ],
       actions:[
-        'TIPS: Pivot fixed-income allocations to short-duration TIPS to protect principal from CPI spikes.',
-        'COMMODITIES: Add broad commodity exposure to directly hedge cost-push inflation drivers.',
-        'GOLD: Allocate 5-10% as a monetary hedge against negative real rates and fiat debasement.',
-        'EQUITIES: Overweight "Pricing Power" (Staples, Healthcare, Energy); severely underweight high-duration Growth/Tech.',
-        'CASH: Build positions in 1-to-3 month T-bills to capture rising risk-free rates with zero duration risk.'
+        'Defensive positioning: energy, healthcare, materials equities',
+        'Gold and commodities as monetary hedge',
+        'Avoid long-duration bonds — inflation erodes real value rapidly',
+        'Reduce leverage — rising rates + slower income = debt stress',
+        'Consult a fiduciary advisor for personalized asset-liability review',
       ]
     }
   ];
@@ -1022,7 +1032,7 @@ function renderScenarios(composite, data) {
             ${s.requires.map(r => `<div style="margin-bottom:3px;font-size:11px">${r}</div>`).join('')}
           </div>
           <div class="sc-conditions" style="border-top:1px solid var(--border);padding-top:8px">
-            <strong>TACTICAL PLAYBOOK ACTIONS</strong>
+            <strong>ACTIONS IF THIS SCENARIO PLAYS OUT</strong>
           </div>
           <ul class="sc-actions">
             ${s.actions.map(a => `<li>${a}</li>`).join('')}
@@ -1102,12 +1112,14 @@ async function init(isRefresh = false) {
     const raw = await fetchAllData(apiKey);
     setLoadStatus('COMPUTING RISK SCORES...', 92);
 
-    // Frequency-aware YoY for all index-level series
+    // ── FIX #1: Frequency-aware YoY for all index-level series ──────
+    // Monthly series (lookback = 12): CORE_CPI, PPI, M2, PCE
+    // Quarterly series (lookback = 4): CORE_PCE
     const coreCPIYoy  = yoyChange(raw.CORE_CPI,  'M');   // CPILFESL monthly index → YoY%
     const ppiYoy      = yoyChange(raw.PPI,        'M');   // PPIFID/PPIACO monthly index → YoY%
     const m2Yoy       = yoyChange(raw.M2,         'M');   // M2SL monthly index → YoY%
     const pceYoy      = yoyChange(raw.PCE,        'M');   // PCEPI monthly index → YoY%
-    const corePceYoy  = yoyChange(raw.CORE_PCE,   'Q');   // DPCERE1Q156NBEA quarterly → YoY%
+    const corePceYoy  = yoyChange(raw.CORE_PCE,   'Q');   // DPCERE1Q156NBEA quarterly → YoY% (FIX: was using 13 obs, needs 4)
 
     // GDP: 4-quarter average to avoid single-quarter distortion
     const gdpRaw = (raw.GDP || []).slice(-4).map(d => d.value).filter(v => !isNaN(v));
@@ -1134,6 +1146,30 @@ async function init(isRefresh = false) {
     };
 
     const composite = computeComposite(scores);
+
+    // Debug console table
+    console.table({
+      '-- SERIES DATA --':   '',
+      'Core CPI YoY %':      coreCPIYoy?.toFixed(2)   ?? 'N/A',
+      'Core PCE YoY % (Q)':  corePceYoy?.toFixed(2)   ?? 'N/A (FIX: quarterly lookback=4)',
+      'GDP 4Q Avg %':        gdpVal?.toFixed(2)        ?? 'N/A',
+      'Unemployment %':      unrateVal?.toFixed(1)     ?? 'N/A',
+      'PPI YoY %':           ppiYoy?.toFixed(2)        ?? 'N/A',
+      'Fed Rate %':          fedRateVal?.toFixed(2)    ?? 'N/A',
+      'Real Fed Rate %':     realFedRate?.toFixed(2)   ?? 'N/A',
+      'Michigan Exp %':      michVal?.toFixed(1)       ?? 'N/A',
+      'M2 YoY %':            m2Yoy?.toFixed(2)         ?? 'N/A',
+      '-- SCORES --':        '',
+      'Score coreCPI':       scores.coreCPI,
+      'Score GDP':           scores.gdp,
+      'Score Unrate':        scores.unrate,
+      'Score PPI':           scores.ppi,
+      'Score FedRate':       scores.fedRate,
+      'Score PCE':           scores.pce,
+      'Score Mich':          scores.mich,
+      'Score M2':            scores.m2,
+      'COMPOSITE':           composite,
+    });
 
     // Deltas
     const coreCPIPrevYoy = yoyChange((raw.CORE_CPI || []).slice(0, -1), 'M');
@@ -1209,6 +1245,7 @@ async function init(isRefresh = false) {
         period: (raw.CORE_PCE||[]).length ? raw.CORE_PCE[raw.CORE_PCE.length-1].date : 'N/A',
         rawSeries: (raw.CORE_PCE||[]).length ? raw.CORE_PCE : raw.PCE,
         isYoY: true,
+        // FIX: Core PCE (DPCERE1Q156NBEA) is quarterly — use 'Q' for correct YoY
         freq: (raw.CORE_PCE||[]).length ? 'Q' : 'M',
         higherIsBad: true,
         trend: calcTrend((raw.CORE_PCE||[]).length ? raw.CORE_PCE : raw.PCE),
@@ -1220,25 +1257,4 @@ async function init(isRefresh = false) {
         delta: michVal !== null ? (michVal > 3.5 ? '⚠ De-anchoring' : '✓ Anchored') : 'N/A',
         deltaClass: michVal !== null ? (michVal > 3.5 ? 'd-bad' : 'd-good') : 'd-none',
         period: (raw.MICH||[]).length ? raw.MICH[raw.MICH.length-1].date : 'N/A',
-        rawSeries: raw.MICH, isYoY: false, freq:'M', higherIsBad: true,
-        trend: calcTrend(raw.MICH),
-        desc:`University of Michigan 1-year inflation expectations %. Readings >3.5% indicate risk of self-fulfilling price spirals.`
-      },
-      {
-        name:'M2 Money Supply', weight:6, score:scores.m2, fredId:'M2SL',
-        displayVal: fmt(m2Yoy), unit:'% YoY',
-        delta: m2Yoy !== null ? (m2Yoy > 6.0 ? '⚠ Elevated' : '✓ Moderate') : 'N/A',
-        deltaClass: m2Yoy !== null ? (m2Yoy > 6.0 ? 'd-bad' : 'd-good') : 'd-none',
-        period: (raw.M2||[]).length ? raw.M2[raw.M2.length-1].date : 'N/A',
-        rawSeries: raw.M2, isYoY: true, freq:'M', higherIsBad: true,
-        trend: calcTrend(raw.M2),
-        desc:`M2 Money Supply YoY %. Rapid expansion >6% fuels underlying monetary inflation. Dashed = 1970s avg (~10.5%).`
-      }
-    ];
-
-    renderIndicators(indicators);
-    renderComposite(composite, scores);
-    renderAlerts(buildAlerts({
-      coreCPI: coreCPIYoy, gdpGrowth: gdpVal, unrate: unrateVal,
-      ppiYoy: ppiYoy, fedRate: fedRateVal, mich: michVal
-    }));
+        rawSeries: raw.MICH, isYoY: fal
